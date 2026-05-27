@@ -1,0 +1,1818 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>견적 금액 생성기 · PIASPACE</title>
+<!-- Pretendard 웹폰트 (CDN) -->
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<style>
+:root{
+  --bg:#f5f7fa;
+  --panel:#ffffff;
+  --panel-2:#fafbfc;
+  --border:#e5e8ed;
+  --border-2:#d0d5dd;
+  --text:#0f172a;
+  --text-2:#475569;
+  --text-3:#94a3b8;
+  --accent:#2563eb;
+  --accent-h:#1d4ed8;
+  --accent-bg:#eff5ff;
+  --accent-bg-2:#dbeafe;
+  --red:#dc2626;
+  --r:14px;
+  --r-sm:10px;
+  --sh:0 1px 2px rgba(15,23,42,.04), 0 1px 3px rgba(15,23,42,.06);
+  --sh-2:0 4px 12px rgba(15,23,42,.08);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{
+  font-family:'Pretendard Variable','Pretendard','Apple SD Gothic Neo','Malgun Gothic',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  font-size:14px;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  letter-spacing:-0.01em;
+}
+/* 입력 요소·버튼은 시스템 폰트로 떨어지지 않도록 강제 */
+input, select, textarea, button{
+  font-family:'Pretendard Variable','Pretendard','Apple SD Gothic Neo','Malgun Gothic',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  letter-spacing:-0.01em;
+}
+
+/* ────────────────  레이아웃  ──────────────── */
+.app{
+  display:grid;
+  grid-template-columns:440px 1fr;
+  min-height:100vh;
+  gap:0;
+}
+
+/* ────────────────  좌측 패널  ──────────────── */
+.side{
+  background:var(--panel);
+  border-right:1px solid var(--border);
+  padding:22px 22px 30px;
+  overflow-y:auto;
+  height:100vh;
+  position:sticky;
+  top:0;
+}
+.brand{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  margin-bottom:26px;
+  padding:2px 0;
+}
+.brand-logo{
+  width:42px;
+  height:42px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+  background:transparent;
+}
+.brand-logo svg{
+  width:100%;
+  height:100%;
+  display:block;
+}
+.brand-text{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:3px;
+  min-height:42px;
+  line-height:1;
+}
+.brand-title{
+  font-family:'Pretendard Variable','Pretendard',-apple-system,sans-serif;
+  font-size:16px;
+  font-weight:700;
+  color:var(--text);
+  letter-spacing:-.02em;
+  line-height:1.2;
+  margin:0;
+}
+.brand-sub{
+  font-family:'Pretendard Variable','Pretendard',-apple-system,sans-serif;
+  font-size:11px;
+  color:var(--text-3);
+  font-weight:600;
+  letter-spacing:.08em;
+  line-height:1.2;
+  margin:0;
+  text-transform:uppercase;
+}
+
+.section{margin-bottom:22px;}
+.section-title{
+  font-size:13px;
+  font-weight:700;
+  color:var(--text);
+  margin-bottom:11px;
+  letter-spacing:-.01em;
+}
+
+/* 입력 필드 그리드 */
+.field-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px 10px;
+}
+.field{display:flex;flex-direction:column;gap:5px;}
+.field-label{
+  font-size:11.5px;
+  font-weight:600;
+  color:var(--text-2);
+}
+.field-input{
+  width:100%;
+  padding:10px 12px;
+  border:1px solid var(--border);
+  border-radius:10px;
+  background:var(--panel-2);
+  font-size:13px;
+  font-family:inherit;
+  color:var(--text);
+  outline:none;
+  transition:all .15s;
+  letter-spacing:-.01em;
+  font-weight:500;
+}
+.field-input:focus{
+  border-color:var(--accent);
+  background:#fff;
+  box-shadow:0 0 0 3px var(--accent-bg);
+}
+.field-input::placeholder{color:var(--text-3);font-weight:400;}
+
+/* ════════════════════════════════════════════════════════
+   커스텀 캘린더 (Pretendard 폰트, 둥근 선택 디자인)
+   ════════════════════════════════════════════════════════ */
+.date-wrap{position:relative;}
+.date-display{
+  width:100%;
+  padding:10px 38px 10px 12px;
+  border:1px solid var(--border);
+  border-radius:10px;
+  background:var(--panel-2);
+  font-size:13px;
+  color:var(--text);
+  cursor:pointer;
+  text-align:left;
+  font-weight:500;
+  letter-spacing:-.01em;
+  transition:all .15s;
+  font-family:inherit;
+  position:relative;
+  outline:none;
+}
+.date-display:hover{border-color:var(--border-2);background:#fff;}
+.date-display.open,
+.date-display:focus{
+  border-color:var(--accent);
+  background:#fff;
+  box-shadow:0 0 0 3px var(--accent-bg);
+}
+.date-display::after{
+  content:'';
+  position:absolute;
+  right:12px;
+  top:50%;
+  width:16px;
+  height:16px;
+  transform:translateY(-50%);
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='4' width='18' height='18' rx='2'/><line x1='16' y1='2' x2='16' y2='6'/><line x1='8' y1='2' x2='8' y2='6'/><line x1='3' y1='10' x2='21' y2='10'/></svg>");
+  background-size:contain;
+  background-repeat:no-repeat;
+  opacity:.7;
+  pointer-events:none;
+}
+.date-display:hover::after{opacity:1;}
+
+.cal-pop{
+  display:none;
+  position:absolute;
+  top:calc(100% + 6px);
+  right:0;
+  width:248px;
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:14px;
+  box-shadow:0 10px 30px rgba(15,23,42,.12), 0 2px 8px rgba(15,23,42,.06);
+  padding:14px;
+  z-index:100;
+  font-family:inherit;
+}
+.cal-pop.open{display:block;}
+.cal-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:10px;
+}
+.cal-title{
+  font-size:13px;
+  font-weight:700;
+  color:var(--text);
+  letter-spacing:-.01em;
+  font-family:inherit;
+}
+.cal-nav{display:flex;gap:2px;}
+.cal-nav-btn{
+  width:26px;
+  height:26px;
+  border-radius:7px;
+  border:none;
+  background:transparent;
+  cursor:pointer;
+  color:var(--text-2);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:14px;
+  font-family:inherit;
+  transition:all .12s;
+}
+.cal-nav-btn:hover{background:var(--accent-bg);color:var(--accent);}
+
+.cal-weekdays{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:2px;
+  margin-bottom:4px;
+}
+.cal-wd{
+  height:26px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:11px;
+  font-weight:600;
+  color:var(--text-3);
+  font-family:inherit;
+  letter-spacing:-.01em;
+}
+.cal-wd.sun{color:#ef4444;}
+.cal-wd.sat{color:#3b82f6;}
+
+.cal-days{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:2px;
+}
+.cal-day{
+  height:30px;
+  border-radius:50%;
+  border:none;
+  background:transparent;
+  cursor:pointer;
+  font-size:12px;
+  font-weight:500;
+  color:var(--text);
+  font-family:inherit;
+  letter-spacing:-.01em;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:all .12s;
+}
+.cal-day:hover:not(.empty):not(.selected){
+  background:var(--accent-bg);
+  color:var(--accent);
+}
+.cal-day.empty{cursor:default;color:var(--text-3);opacity:.35;}
+.cal-day.today{
+  font-weight:700;
+  color:var(--accent);
+  background:var(--accent-bg);
+}
+.cal-day.selected{
+  background:var(--accent);
+  color:#fff;
+  font-weight:700;
+  box-shadow:0 2px 8px rgba(37,99,235,.35);
+}
+.cal-day.sun{color:#ef4444;}
+.cal-day.sat{color:#3b82f6;}
+.cal-day.selected.sun,
+.cal-day.selected.sat{color:#fff;}
+
+.cal-foot{
+  display:flex;
+  justify-content:space-between;
+  padding-top:10px;
+  margin-top:8px;
+  border-top:1px solid var(--border);
+}
+.cal-foot-btn{
+  border:none;
+  background:transparent;
+  cursor:pointer;
+  font-size:12px;
+  font-weight:600;
+  font-family:inherit;
+  padding:5px 8px;
+  border-radius:6px;
+  letter-spacing:-.01em;
+  transition:all .12s;
+}
+.cal-foot-btn.clear{color:var(--text-3);}
+.cal-foot-btn.clear:hover{color:var(--red);background:#fef2f2;}
+.cal-foot-btn.today-btn{color:var(--accent);}
+.cal-foot-btn.today-btn:hover{background:var(--accent-bg);}
+
+/* 솔루션 카드 */
+.sol-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+.sol-card{
+  border:1.5px solid var(--border);
+  border-radius:var(--r-sm);
+  padding:11px 12px;
+  cursor:pointer;
+  background:var(--panel);
+  transition:all .15s;
+  position:relative;
+}
+.sol-card:hover{border-color:var(--border-2);background:var(--panel-2);}
+.sol-card.active{
+  border-color:var(--accent);
+  background:var(--accent-bg);
+  box-shadow:0 0 0 1px var(--accent) inset;
+}
+.sol-name{
+  font-size:13px;
+  font-weight:700;
+  color:var(--text);
+  margin-bottom:4px;
+}
+.sol-desc{
+  font-size:10.5px;
+  color:var(--text-2);
+  line-height:1.5;
+  margin-bottom:2px;
+}
+.sol-price{
+  font-size:10.5px;
+  color:var(--accent);
+  font-weight:600;
+  margin-top:5px;
+  letter-spacing:-.01em;
+}
+
+/* 티어 */
+.tier-row{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:6px;
+  background:var(--panel-2);
+  padding:5px;
+  border-radius:11px;
+  border:1px solid var(--border);
+}
+.tier-btn{
+  padding:9px;
+  border-radius:8px;
+  border:none;
+  background:transparent;
+  font-size:13px;
+  font-weight:600;
+  color:var(--text-2);
+  cursor:pointer;
+  font-family:inherit;
+  transition:all .15s;
+}
+.tier-btn:hover{color:var(--text);}
+.tier-btn.active{
+  background:#fff;
+  color:var(--accent);
+  box-shadow:0 1px 3px rgba(15,23,42,.08);
+}
+
+/* 채널 수 */
+.ch-row{display:flex;align-items:center;gap:10px;}
+.ch-input{
+  flex:1;
+  padding:9px 11px;
+  border:1px solid var(--border);
+  border-radius:8px;
+  background:var(--panel-2);
+  font-size:13px;
+  font-weight:700;
+  font-family:inherit;
+  outline:none;
+  text-align:center;
+  transition:all .15s;
+}
+.ch-input:focus{
+  border-color:var(--accent);
+  background:#fff;
+  box-shadow:0 0 0 3px var(--accent-bg);
+}
+.ch-suffix{font-size:12px;color:var(--text-2);font-weight:600;}
+
+/* 부품 선택 영역 - 접이식 */
+.parts-wrap{margin-top:6px;}
+.cat-card{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:14px;
+  margin-bottom:8px;
+  overflow:hidden;
+  transition:all .2s;
+}
+.cat-card:hover{border-color:var(--border-2);}
+.cat-card.open{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px var(--accent-bg);
+}
+.cat-hd{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:13px 14px;
+  cursor:pointer;
+  user-select:none;
+}
+.cat-pill{
+  font-size:10.5px;
+  font-weight:700;
+  padding:4px 10px;
+  border-radius:6px;
+  background:#f1f5f9;
+  color:#475569;
+  flex-shrink:0;
+  letter-spacing:.01em;
+  min-width:58px;
+  text-align:center;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-family:inherit;
+}
+.cat-card.open .cat-pill,
+.cat-preview.selected ~ .cat-pill{
+  background:var(--accent-bg);
+  color:var(--accent);
+}
+.cat-card.has-selection .cat-pill{
+  background:var(--accent-bg);
+  color:var(--accent);
+}
+.cat-preview{
+  font-size:13px;
+  color:var(--text-3);
+  flex:1;
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-weight:500;
+}
+.cat-preview.selected{
+  color:var(--text);
+  font-weight:600;
+}
+.cat-price{
+  font-size:13px;
+  font-weight:700;
+  color:var(--accent);
+  flex-shrink:0;
+  padding-left:6px;
+  letter-spacing:-.01em;
+}
+.cat-chev{
+  color:var(--text-3);
+  font-size:10px;
+  transition:transform .25s;
+  flex-shrink:0;
+  margin-left:2px;
+}
+.cat-card.open .cat-chev{transform:rotate(180deg);color:var(--accent);}
+.cat-body{display:none;border-top:1px solid var(--border);padding:6px 8px;background:var(--panel-2);}
+.cat-card.open .cat-body{display:block;}
+.part{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  padding:11px 12px;
+  border-radius:10px;
+  cursor:pointer;
+  border:1.5px solid transparent;
+  margin-bottom:3px;
+  transition:all .15s;
+  background:#fff;
+  font-family:inherit;
+}
+.part:hover{background:var(--accent-bg);}
+.part.on{background:var(--accent-bg);border-color:var(--accent);}
+.radio{
+  width:16px;
+  height:16px;
+  border-radius:50%;
+  border:2px solid var(--border-2);
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:all .15s;
+  margin-top:1px;
+  background:#fff;
+}
+.part.on .radio{background:var(--accent);border-color:var(--accent);}
+.part.on .radio::after{
+  content:'';
+  width:4px;
+  height:4px;
+  background:#fff;
+  border-radius:50%;
+  display:block;
+}
+.part-info{flex:1;min-width:0;}
+.part-model{
+  font-size:12.5px;
+  font-weight:500;
+  color:var(--text);
+  word-break:keep-all;
+  overflow-wrap:break-word;
+  line-height:1.5;
+  font-family:inherit;
+}
+.part.on .part-model{font-weight:600;}
+.part-r{display:flex;align-items:center;gap:10px;flex-shrink:0;align-self:flex-start;padding-top:1px;}
+.part-price{font-size:12.5px;font-weight:700;white-space:nowrap;font-family:inherit;color:var(--text);}
+.part.on .part-price{color:var(--accent);}
+.qty-ctrl{
+  display:flex;
+  align-items:center;
+  gap:3px;
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:2px;
+}
+.qbtn{
+  width:22px;
+  height:22px;
+  border-radius:6px;
+  border:none;
+  background:transparent;
+  cursor:pointer;
+  font-size:14px;
+  line-height:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--text-2);
+  font-family:inherit;
+  font-weight:600;
+  transition:background .12s;
+}
+.qbtn:hover{background:var(--accent-bg);color:var(--accent);}
+.qval{font-size:12.5px;font-weight:700;min-width:18px;text-align:center;font-family:inherit;}
+.price-edit-wrap{display:flex;align-items:center;gap:3px;}
+.price-edit{
+  width:80px;
+  padding:2px 5px;
+  border-radius:4px;
+  border:1px solid var(--border);
+  background:var(--accent-bg);
+  font-size:10.5px;
+  font-weight:700;
+  text-align:right;
+  color:var(--accent);
+  font-family:inherit;
+  outline:none;
+}
+.price-edit:focus{border-color:var(--accent);}
+.price-edit-lbl{font-size:9.5px;color:var(--text-3);}
+
+.add-custom-btn{
+  width:100%;
+  margin-top:8px;
+  padding:9px;
+  border-radius:8px;
+  border:1.5px dashed var(--border-2);
+  background:transparent;
+  color:var(--text-3);
+  font-size:12px;
+  font-weight:600;
+  cursor:pointer;
+  font-family:inherit;
+  transition:all .15s;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+}
+.add-custom-btn:hover{
+  border-color:var(--accent);
+  color:var(--accent);
+  background:var(--accent-bg);
+}
+
+.reset-btn{
+  width:100%;
+  margin-top:14px;
+  padding:9px;
+  border-radius:8px;
+  border:1px solid #fee2e2;
+  background:#fef2f2;
+  color:var(--red);
+  font-size:12px;
+  font-weight:600;
+  cursor:pointer;
+  font-family:inherit;
+  transition:all .15s;
+}
+.reset-btn:hover{background:#fee2e2;}
+
+/* ────────────────  우측 미리보기  ──────────────── */
+.preview{
+  padding:22px 28px 60px;
+  overflow-y:auto;
+}
+.preview-hd{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:18px;
+}
+.preview-title{
+  font-size:19px;
+  font-weight:700;
+  color:var(--text);
+  letter-spacing:-.02em;
+}
+.action-row{display:flex;gap:8px;}
+.action-btn{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:9px 16px;
+  border-radius:10px;
+  font-size:13px;
+  font-weight:600;
+  cursor:pointer;
+  font-family:inherit;
+  transition:all .15s;
+  border:1px solid var(--border-2);
+  background:#fff;
+  color:var(--text);
+}
+.action-btn:hover{background:var(--panel-2);}
+.action-btn.primary{
+  background:var(--accent);
+  border-color:var(--accent);
+  color:#fff;
+}
+.action-btn.primary:hover{background:var(--accent-h);}
+
+/* 견적서 카드 */
+.quote-card{
+  background:var(--panel);
+  border-radius:var(--r);
+  box-shadow:var(--sh);
+  padding:26px 30px;
+  margin-bottom:14px;
+}
+.quote-customer{
+  font-size:22px;
+  font-weight:800;
+  color:var(--text);
+  letter-spacing:-.02em;
+  min-height:30px;
+  padding-bottom:8px;
+}
+.quote-customer.empty{color:var(--text-3);font-weight:500;letter-spacing:0;}
+.quote-meta{
+  font-size:12px;
+  color:var(--text-3);
+  margin-bottom:24px;
+  font-weight:500;
+}
+.quote-meta strong{color:var(--text-2);font-weight:600;}
+
+/* 메타 요약 박스 (캡처의 솔루션/채널수/단가/할인) */
+.meta-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  margin-bottom:20px;
+}
+.meta-box{
+  background:var(--panel-2);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:12px 14px;
+}
+.meta-label{
+  font-size:10.5px;
+  color:var(--text-3);
+  font-weight:600;
+  margin-bottom:4px;
+  letter-spacing:.01em;
+}
+.meta-value{
+  font-size:14px;
+  font-weight:700;
+  color:var(--text);
+  letter-spacing:-.01em;
+}
+.meta-value.accent{color:var(--accent);}
+
+/* 항목 테이블 */
+.q-table{width:100%;border-collapse:collapse;}
+.q-table thead th{
+  text-align:left;
+  font-size:11.5px;
+  font-weight:600;
+  color:var(--text-3);
+  padding:8px 0;
+  border-bottom:1px solid var(--border);
+  text-transform:uppercase;
+  letter-spacing:.03em;
+}
+.q-table thead th.right{text-align:right;}
+.q-section-row td{
+  padding:9px 0 6px;
+  background:var(--panel-2);
+  border:none;
+}
+.q-section-row td{
+  font-size:11px;
+  color:var(--text-2);
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  text-align:right;
+  padding-right:4px;
+  border-top:1px solid var(--border);
+}
+.q-row td{
+  padding:11px 0;
+  font-size:13px;
+  border-bottom:1px solid var(--border);
+  color:var(--text);
+  vertical-align:top;
+}
+.q-row td.right{text-align:right;font-weight:700;white-space:nowrap;}
+.q-item-name{font-weight:600;color:var(--text);}
+.q-item-detail{
+  font-size:11px;
+  color:var(--text-3);
+  margin-top:3px;
+  line-height:1.5;
+}
+.q-calc{font-size:12px;color:var(--text-2);font-weight:500;}
+.q-subtotal td{
+  padding:10px 0;
+  font-size:13px;
+  font-weight:700;
+  color:var(--accent);
+  border-bottom:1px solid var(--border);
+}
+.q-subtotal td.right{text-align:right;}
+
+/* 합계 박스 */
+.total-card{
+  background:var(--accent-bg);
+  border-radius:var(--r);
+  padding:20px 24px;
+  margin-top:20px;
+}
+.total-label{
+  font-size:13px;
+  color:var(--text-2);
+  font-weight:600;
+  margin-bottom:6px;
+}
+.total-amount{
+  font-size:34px;
+  font-weight:800;
+  color:var(--accent);
+  letter-spacing:-.025em;
+  line-height:1;
+}
+.total-vat{
+  font-size:12.5px;
+  color:var(--text-2);
+  margin-top:7px;
+  font-weight:500;
+}
+
+.empty-state{
+  text-align:center;
+  padding:80px 20px;
+  color:var(--text-3);
+}
+.empty-state-ico{font-size:46px;margin-bottom:14px;opacity:.4;}
+.empty-state-txt{font-size:14px;font-weight:500;}
+.empty-state-sub{font-size:12px;margin-top:6px;color:var(--text-3);}
+
+/* 모달 */
+.modal-bg{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(15,23,42,.5);
+  z-index:9000;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+.modal-bg.open{display:flex;}
+.modal-box{
+  background:#fff;
+  border-radius:14px;
+  padding:24px;
+  width:100%;
+  max-width:560px;
+  box-shadow:0 16px 50px rgba(15,23,42,.2);
+}
+.modal-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:12px;
+}
+.modal-title{font-size:15px;font-weight:700;}
+.modal-close{
+  background:none;
+  border:none;
+  cursor:pointer;
+  font-size:22px;
+  color:var(--text-3);
+  line-height:1;
+  width:28px;
+  height:28px;
+}
+.modal-hint{font-size:12px;color:var(--text-3);margin-bottom:9px;}
+.modal-ta{
+  width:100%;
+  height:280px;
+  font-family:'SF Mono','Courier New',monospace;
+  font-size:11.5px;
+  line-height:1.7;
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:12px;
+  resize:vertical;
+  outline:none;
+  background:var(--panel-2);
+}
+.modal-btns{display:flex;gap:8px;margin-top:12px;}
+.modal-btn{
+  flex:1;
+  padding:10px;
+  border-radius:8px;
+  font-size:13px;
+  font-weight:600;
+  cursor:pointer;
+  font-family:inherit;
+}
+.modal-btn-sec{
+  background:#fff;
+  color:var(--text-2);
+  border:1px solid var(--border-2);
+}
+.modal-btn-pri{
+  background:var(--accent);
+  color:#fff;
+  border:none;
+}
+.modal-btn-pri:hover{background:var(--accent-h);}
+
+/* 토스트 */
+.toast{
+  position:fixed;
+  bottom:24px;
+  left:50%;
+  transform:translateX(-50%) translateY(10px);
+  background:#0f172a;
+  color:#fff;
+  padding:11px 20px;
+  border-radius:10px;
+  font-size:13px;
+  font-weight:500;
+  opacity:0;
+  transition:all .25s;
+  z-index:9999;
+  pointer-events:none;
+  box-shadow:0 10px 30px rgba(15,23,42,.25);
+}
+.toast.on{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
+
+/* 스크롤바 */
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border-2);border-radius:99px;}
+::-webkit-scrollbar-thumb:hover{background:#94a3b8;}
+
+/* 인쇄용 */
+@media print{
+  body{background:#fff;}
+  .side, .action-row{display:none!important;}
+  .app{display:block;}
+  .preview{padding:0;}
+  .quote-card{box-shadow:none;border:1px solid var(--border);}
+}
+
+/* 반응형 */
+@media (max-width:1000px){
+  .app{grid-template-columns:1fr;}
+  .side{height:auto;position:static;border-right:none;border-bottom:1px solid var(--border);}
+  .meta-grid{grid-template-columns:repeat(2,1fr);}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ═══════════════ 좌측 사이드 패널 ═══════════════ -->
+  <aside class="side">
+    <div class="brand">
+      <div class="brand-logo">
+        <svg viewBox="0 0 1500 1500" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="PIASPACE 로고">
+          <path d="M1009.52 1177.91C1007.65 1179.62 1005.46 1180.94 1003.07 1181.79C1000.68 1182.64 998.145 1183.01 995.61 1182.88C993.075 1182.75 990.593 1182.11 988.309 1181.01C986.026 1179.91 983.988 1178.37 982.315 1176.47C939.941 1128.84 804.191 976.436 768.427 936.104C647.663 799.999 702 648.473 769.372 577.361L981.497 331.56C983.978 328.681 987.265 326.598 990.943 325.575C994.62 324.553 998.52 324.637 1002.15 325.817C1004.54 326.629 1006.74 327.902 1008.63 329.563L1130.85 436.324C1132.78 437.982 1134.36 440.007 1135.5 442.28C1136.63 444.553 1137.3 447.028 1137.46 449.56C1137.79 454.655 1136.1 459.677 1132.74 463.545L914.503 717.15C878.362 758.106 907.011 790.197 917.715 802.496C953.541 842.828 1088.98 994.854 1131.41 1042.49C1133.99 1045.33 1135.65 1048.87 1136.18 1052.65C1136.72 1056.43 1136.11 1060.28 1134.44 1063.72C1133.36 1065.99 1131.84 1068.03 1129.97 1069.71L1009.45 1177.91H1009.52Z" fill="#2A29ED"/>
+          <path d="M501.406 1178.2L380.965 1069.54C378.073 1067.01 376.012 1063.68 375.047 1059.97C374.082 1056.26 374.257 1052.36 375.551 1048.75C376.368 1046.36 377.652 1044.15 379.328 1042.26C421.763 994.672 557.251 842.62 593.011 802.28C603.84 789.916 632.487 757.695 596.096 716.669L592.13 712.173L378.069 464.142C375.556 461.248 373.968 457.678 373.508 453.885C373.049 450.093 373.738 446.251 375.488 442.848C376.611 440.59 378.173 438.574 380.084 436.916L502.287 330.136C504.178 328.474 506.385 327.202 508.777 326.396C511.169 325.589 513.699 325.264 516.22 325.438C518.74 325.612 521.201 326.283 523.457 327.412C525.713 328.54 527.72 330.103 529.36 332.009L741.532 577.979C808.772 648.729 863.232 800.032 742.539 936.724C706.715 977.063 570.409 1129.49 528.478 1177.14C525.949 1179.96 522.618 1181.96 518.921 1182.88C515.224 1183.79 511.335 1183.57 507.765 1182.26C505.42 1181.35 503.28 1179.99 501.469 1178.26L501.406 1178.2Z" fill="#30DCFB"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <div class="brand-title">견적 금액 생성기</div>
+        <div class="brand-sub">PIASPACE</div>
+      </div>
+    </div>
+
+    <!-- 고객 정보 -->
+    <div class="section">
+      <div class="section-title">고객 정보</div>
+      <div class="field-grid">
+        <div class="field">
+          <label class="field-label">고객사명</label>
+          <input class="field-input" id="customerName" type="text" placeholder="예) 금호타이어"/>
+        </div>
+        <div class="field">
+          <label class="field-label">프로젝트명</label>
+          <input class="field-input" id="projectName" type="text" placeholder="예) 공장 안전관제"/>
+        </div>
+        <div class="field">
+          <label class="field-label">담당자</label>
+          <input class="field-input" id="managerName" type="text" placeholder="담당자명"/>
+        </div>
+        <div class="field">
+          <label class="field-label">견적 일자</label>
+          <div class="date-wrap">
+            <button type="button" class="date-display" id="dateDisplay" onclick="toggleCal()" aria-haspopup="dialog"></button>
+            <input type="hidden" id="quoteDate"/>
+            <div class="cal-pop" id="calPop" role="dialog" aria-label="날짜 선택">
+              <div class="cal-head">
+                <span class="cal-title" id="calTitle"></span>
+                <div class="cal-nav">
+                  <button type="button" class="cal-nav-btn" onclick="calNav(-1)" aria-label="이전 달">↑</button>
+                  <button type="button" class="cal-nav-btn" onclick="calNav(1)" aria-label="다음 달">↓</button>
+                </div>
+              </div>
+              <div class="cal-weekdays">
+                <div class="cal-wd sun">일</div>
+                <div class="cal-wd">월</div>
+                <div class="cal-wd">화</div>
+                <div class="cal-wd">수</div>
+                <div class="cal-wd">목</div>
+                <div class="cal-wd">금</div>
+                <div class="cal-wd sat">토</div>
+              </div>
+              <div class="cal-days" id="calDays"></div>
+              <div class="cal-foot">
+                <button type="button" class="cal-foot-btn clear" onclick="clearDate()">삭제</button>
+                <button type="button" class="cal-foot-btn today-btn" onclick="setToday()">오늘</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 부품 선택 -->
+    <div class="section">
+      <div class="section-title">부품 선택</div>
+      <div class="parts-wrap" id="partsWrap"></div>
+      <button class="add-custom-btn" onclick="addCustom()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="12" y1="5" x2="12" y2="19"/>
+          <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        수기 항목 추가
+      </button>
+      <button class="reset-btn" onclick="resetAll()">전체 초기화</button>
+    </div>
+  </aside>
+
+  <!-- ═══════════════ 우측 견적서 미리보기 ═══════════════ -->
+  <main class="preview">
+    <div class="preview-hd">
+      <h1 class="preview-title">견적서 미리보기</h1>
+      <div class="action-row">
+        <button class="action-btn" onclick="openCopyModal()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="9" y="9" width="13" height="13" rx="2"/>
+            <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+          </svg>
+          텍스트 복사
+        </button>
+        <button class="action-btn primary" onclick="printPDF()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 6 2 18 2 18 9"/>
+            <path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/>
+            <rect x="6" y="14" width="12" height="8"/>
+          </svg>
+          인쇄 / PDF
+        </button>
+      </div>
+    </div>
+
+    <div class="quote-card" id="quoteCard">
+      <!-- 동적 렌더링 -->
+    </div>
+  </main>
+
+</div>
+
+<!-- 텍스트 복사 모달 -->
+<div class="modal-bg" id="copyModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <span class="modal-title" id="modalTitle">견적서 복사</span>
+      <button class="modal-close" onclick="closeCopyModal()">×</button>
+    </div>
+    <p class="modal-hint" id="modalHint">탭으로 구분된 형식입니다. 엑셀에 바로 붙여넣을 수 있습니다.</p>
+    <div style="display:flex;gap:6px;margin-bottom:9px;">
+      <button class="modal-btn modal-btn-sec" id="tabText" onclick="switchCopyTab('text')" style="flex:1;padding:8px;font-size:12px;">텍스트 양식</button>
+      <button class="modal-btn modal-btn-pri" id="tabExcel" onclick="switchCopyTab('excel')" style="flex:1;padding:8px;font-size:12px;">엑셀 양식 (TSV)</button>
+    </div>
+    <textarea class="modal-ta" id="modalTa" readonly></textarea>
+    <div class="modal-btns">
+      <button class="modal-btn modal-btn-sec" onclick="selectAllModal()">전체 선택</button>
+      <button class="modal-btn modal-btn-pri" onclick="copyModalText()">복사하기</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ════════════════════════════════════════════════════════
+   품목 데이터베이스 (HTML 기존 + 엑셀에서 추가된 신규 항목)
+   - 동일/유사 품목은 HTML 가격을 유지
+   - 엑셀에만 있던 신규 품목명은 그대로 추가
+   ════════════════════════════════════════════════════════ */
+const DB = {
+  CPU:{label:'CPU',color:'#475569',bg:'#f1f5f9',items:[
+    {id:'c_excel_1',model:'Intel Core i5-14400F (소비전력 TDP 65W)',price:273000},
+    {id:'c_excel_2',model:'Intel Core i7-14700K (TDP 105W)',price:487980},
+    {id:'c_excel_3',model:'2CPU · Intel Gen5 Xeon Scalable 4510Y (12-core, 2.4GHz, 30M)',price:3170000},
+    {id:'c_excel_4',model:'2CPU · Intel Gen5 Xeon Scalable 6526Y (16-core, 2.8GHz, 37.5M)',price:4074000},
+    {id:'c1',model:'인텔 코어 i5-14400 (랩터레이크)',price:345300},
+    {id:'c3',model:'인텔 코어 i5-14400F (랩터레이크)',price:259000},
+    {id:'c5',model:'인텔 코어 울트라5 225F (애로우레이크)',price:243000},
+    {id:'c6',model:'인텔 코어 울트라7 265KF (애로우레이크)',price:390000},
+    {id:'c7',model:'인텔 코어 i7-14700F (랩터레이크)',price:499000},
+    {id:'c9',model:'인텔 코어 i7-14700KF',price:506000},
+    {id:'c10',model:'AMD 라이젠 TR PRO 9955WX (워크스테이션)',price:2740000},
+    {id:'c11',model:'AMD 라이젠 TR PRO 7955WX (16C) 워크스테이션',price:2780000},
+  ]},
+  RAM:{label:'RAM',color:'#475569',bg:'#f1f5f9',items:[
+    {id:'r_excel_1',model:'DDR5 4800MHz 8GB',price:178000},
+    {id:'r_excel_2',model:'DDR5 4800MHz 16GB',price:305390},
+    {id:'r_excel_3',model:'DDR5 5200MHz 16GB',price:305390},
+    {id:'r_excel_4',model:'DDR5 5600MHz 32GB',price:305390},
+    {id:'r_excel_5',model:'32GB DDR5 Registered ECC PC5 4800',price:1621000},
+    {id:'r_excel_6',model:'64GB DDR5 Registered ECC PC5 4800 (32GB x2)',price:3242000},
+    {id:'r1',model:'KLEVV DDR5-5600 CL46 (16GB)',price:330000},
+    {id:'r2',model:'삼성 DDR5-5600 16GB',price:365000},
+    {id:'r3',model:'SK하이닉스 DDR5 PC5-44800 16GB',price:374000},
+    {id:'r4',model:'TeamGroup DDR5-5600 CL46 Elite 서린 (16GB)',price:354000},
+    {id:'r5',model:'삼성 DDR5-5600 32GB',price:730000},
+    {id:'r6',model:'삼성 DDR5-4800 ECC/REG 64GB (서버/WS용)',price:3486000},
+  ]},
+  SSD:{label:'SSD',color:'#475569',bg:'#f1f5f9',items:[
+    {id:'s_excel_1',model:'NVMe SSD 1TB (PCIe 4.0x4)',price:284000},
+    {id:'s_excel_2',model:'NVMe SSD 1TB (OS/캐시)',price:149000},
+    {id:'s_excel_3',model:'NVMe SSD 1TB (서버 OS/캐시)',price:60000},
+    {id:'s_excel_4',model:'NVMe SSD 2TB (OS/캐시)',price:87000},
+    {id:'s1',model:'마이크론 Crucial P310 M.2 NVMe 1TB',price:284000},
+    {id:'s3',model:'SK하이닉스 Gold P31 M.2 NVMe 1TB',price:340000},
+    {id:'s4',model:'SK하이닉스 Platinum P41 M.2 NVMe 1TB',price:400000},
+    {id:'s5',model:'Seagate FireCuda 530R 1TB (M.2 PCIe Gen4)',price:572000},
+  ]},
+  HDD:{label:'HDD',color:'#475569',bg:'#f1f5f9',items:[
+    {id:'h_excel_1',model:'HDD 1TB (MinIO Erasure Coding)',price:174000},
+    {id:'h_excel_2',model:'HDD 2TB (MinIO Erasure Coding)',price:150000},
+    {id:'h1',model:'WD BLUE 2TB 3.5" SATA 7200/256M',price:176000},
+    {id:'h2',model:'WD BLUE 2TB 3.5" SATA',price:165000},
+    {id:'h5',model:'WD UltraStar 2TB SATA 7200rpm (서버용)',price:257000},
+    {id:'h6',model:'WD UltraStar 4TB SATA 7200rpm (서버/WS용)',price:373000},
+  ]},
+  GPU:{label:'GPU',color:'#475569',bg:'#f1f5f9',items:[
+    {id:'g_excel_1',model:'RTX 5050 (그래픽카드 1개 장착 / TDP 100W)',price:457000},
+    {id:'g_excel_2',model:'RTX 5050 (2개 장착 | TDP 100W × 2)',price:457000},
+    {id:'g_excel_3',model:'RTX 5060 (그래픽카드 1개 장착 / TDP 100W)',price:537520},
+    {id:'g_excel_4',model:'RTX 5070 (TDP 250W)',price:1084940},
+    {id:'g_excel_5',model:'RTX 5080 (TDP 360W)',price:2079950},
+    {id:'g_excel_6',model:'NVIDIA Blackwell RTX PRO 4000 D7 24GB, 140W Blower',price:3086000},
+    {id:'g1',model:'MSI RTX 5050 쉐도우 2X OC D6 8GB',price:453000},
+    {id:'g2',model:'MSI RTX 5050 벤투스 2X OC D6 8GB',price:458000},
+    {id:'g3',model:'MSI RTX 5070 벤투스 2X OC D7 12GB',price:969000},
+    {id:'g4',model:'MSI RTX 5070 게이밍 트리오 OC D7 12GB',price:1130000},
+    {id:'g6',model:'PNY RTX 5070 OC D7 12GB Triple Fan',price:980000},
+    {id:'g7',model:'NVIDIA RTX PRO 4000 Blackwell D7 24GB',price:3086000},
+    {id:'g8',model:'NVIDIA RTX PRO 4000 Blackwell D7 24GB (2nd)',price:3498000},
+    {id:'g9',model:'NVIDIA RTX PRO 6000 Blackwell WS D7 96GB',price:18447000},
+  ]},
+};
+
+/* ════════════════════════════════════════════════════════
+   상태
+   ════════════════════════════════════════════════════════ */
+const state = {};      // 선택된 부품 { itemId: {item, cat, qty, customPrice?, customName?} }
+let customs = [];      // 수기 항목
+let customSeq = 0;
+let currentCopyTab = 'excel';
+
+/* ════════════════════════════════════════════════════════
+   커스텀 캘린더
+   ════════════════════════════════════════════════════════ */
+let calState = {
+  year: new Date().getFullYear(),
+  month: new Date().getMonth(), // 0-indexed
+  selected: null, // 'YYYY-MM-DD' or null
+};
+
+function pad2(n){return String(n).padStart(2,'0');}
+function toDateStr(y, m, d){return `${y}-${pad2(m+1)}-${pad2(d)}`;}
+
+function fmtDisplayDate(str){
+  if(!str) return '날짜 선택';
+  // 'YYYY-MM-DD' → 'YYYY년 MM월 DD일 (요일)'
+  const [y,m,d] = str.split('-').map(Number);
+  const date = new Date(y, m-1, d);
+  const wd = ['일','월','화','수','목','금','토'][date.getDay()];
+  return `${y}년 ${pad2(m)}월 ${pad2(d)}일 (${wd})`;
+}
+
+function initDate(){
+  const d = new Date();
+  const today = toDateStr(d.getFullYear(), d.getMonth(), d.getDate());
+  calState.selected = today;
+  calState.year = d.getFullYear();
+  calState.month = d.getMonth();
+  document.getElementById('quoteDate').value = today;
+  document.getElementById('dateDisplay').textContent = fmtDisplayDate(today);
+  renderCalendar();
+}
+
+function renderCalendar(){
+  const y = calState.year;
+  const m = calState.month;
+  document.getElementById('calTitle').textContent = `${y}년 ${pad2(m+1)}월`;
+
+  const firstDay = new Date(y, m, 1).getDay();      // 0=일
+  const lastDate = new Date(y, m+1, 0).getDate();   // 이달 말일
+
+  const today = new Date();
+  const todayStr = toDateStr(today.getFullYear(), today.getMonth(), today.getDate());
+
+  let html = '';
+  // 앞 빈칸
+  for(let i=0; i<firstDay; i++){
+    html += `<button type="button" class="cal-day empty" disabled></button>`;
+  }
+  // 날짜
+  for(let d=1; d<=lastDate; d++){
+    const dateStr = toDateStr(y, m, d);
+    const dow = new Date(y, m, d).getDay();
+    const classes = ['cal-day'];
+    if(dateStr === calState.selected) classes.push('selected');
+    if(dateStr === todayStr) classes.push('today');
+    if(dow === 0) classes.push('sun');
+    if(dow === 6) classes.push('sat');
+    html += `<button type="button" class="${classes.join(' ')}" onclick="selectDate('${dateStr}')">${d}</button>`;
+  }
+  document.getElementById('calDays').innerHTML = html;
+}
+
+function toggleCal(){
+  const pop = document.getElementById('calPop');
+  const disp = document.getElementById('dateDisplay');
+  const isOpen = pop.classList.contains('open');
+  if(isOpen){
+    pop.classList.remove('open');
+    disp.classList.remove('open');
+  }else{
+    // 열 때 현재 선택된 날짜로 위치 이동
+    if(calState.selected){
+      const [y,m] = calState.selected.split('-').map(Number);
+      calState.year = y;
+      calState.month = m-1;
+    }
+    renderCalendar();
+    pop.classList.add('open');
+    disp.classList.add('open');
+  }
+}
+
+function calNav(delta){
+  calState.month += delta;
+  if(calState.month < 0){ calState.month = 11; calState.year--; }
+  if(calState.month > 11){ calState.month = 0; calState.year++; }
+  renderCalendar();
+}
+
+function selectDate(dateStr){
+  calState.selected = dateStr;
+  document.getElementById('quoteDate').value = dateStr;
+  document.getElementById('dateDisplay').textContent = fmtDisplayDate(dateStr);
+  renderCalendar();
+  // 잠깐 보여주고 닫기
+  setTimeout(()=>{
+    document.getElementById('calPop').classList.remove('open');
+    document.getElementById('dateDisplay').classList.remove('open');
+  }, 150);
+  renderPreview();
+}
+
+function setToday(){
+  const d = new Date();
+  const today = toDateStr(d.getFullYear(), d.getMonth(), d.getDate());
+  calState.year = d.getFullYear();
+  calState.month = d.getMonth();
+  selectDate(today);
+}
+
+function clearDate(){
+  calState.selected = null;
+  document.getElementById('quoteDate').value = '';
+  document.getElementById('dateDisplay').textContent = '날짜 선택';
+  renderCalendar();
+  document.getElementById('calPop').classList.remove('open');
+  document.getElementById('dateDisplay').classList.remove('open');
+  renderPreview();
+}
+
+// 캘린더 외부 클릭 시 닫기
+document.addEventListener('click', (e)=>{
+  const wrap = document.querySelector('.date-wrap');
+  if(wrap && !wrap.contains(e.target)){
+    document.getElementById('calPop').classList.remove('open');
+    document.getElementById('dateDisplay').classList.remove('open');
+  }
+});
+
+// ESC 키로 캘린더 닫기
+document.addEventListener('keydown', (e)=>{
+  if(e.key === 'Escape'){
+    document.getElementById('calPop').classList.remove('open');
+    document.getElementById('dateDisplay').classList.remove('open');
+  }
+});
+
+/* ════════════════════════════════════════════════════════
+   포맷터
+   ════════════════════════════════════════════════════════ */
+const fmt = n => n.toLocaleString('ko-KR')+'원';
+const fmtN = n => n.toLocaleString('ko-KR');
+
+/* ════════════════════════════════════════════════════════
+   부품 선택
+   ════════════════════════════════════════════════════════ */
+function pick(catKey, itemId){
+  const wasSelected = !!state[itemId];
+  // 같은 카테고리 다른 부품 제거
+  Object.keys(state).forEach(id=>{
+    if(state[id].cat===catKey && id!==itemId) delete state[id];
+  });
+  if(wasSelected){
+    // 이미 선택된 부품 클릭 → 해제 (카테고리는 열어둠)
+    delete state[itemId];
+  }else{
+    const item = DB[catKey].items.find(i=>i.id===itemId);
+    if(item){
+      state[itemId] = {item, cat:catKey, qty:1};
+      // 새로 선택했으면 카테고리 자동 닫기 (선택 후 원위치)
+      openCats[catKey] = false;
+    }
+  }
+  render();
+}
+
+function adjQty(id, delta, e){
+  e && e.stopPropagation();
+  if(!state[id]) return;
+  state[id].qty = Math.max(1, state[id].qty + delta);
+  render();
+}
+
+function setPrice(id, val){
+  const v = parseInt(val);
+  if(!isNaN(v) && v>=0){
+    state[id].customPrice = v;
+    render();
+  }
+}
+
+function delItem(id){
+  delete state[id];
+  render();
+}
+
+/* ════════════════════════════════════════════════════════
+   수기 항목
+   ════════════════════════════════════════════════════════ */
+function addCustom(){
+  customs.push({id:customSeq++, name:'', price:0, qty:1});
+  render();
+}
+function setCustomName(id, val){
+  const c = customs.find(x=>x.id===id);
+  if(c){ c.name = val; render(); }
+}
+function setCustomPrice(id, val){
+  const c = customs.find(x=>x.id===id);
+  if(c){ c.price = parseInt(val)||0; render(); }
+}
+function adjCustomQty(id, delta){
+  const c = customs.find(x=>x.id===id);
+  if(c){ c.qty = Math.max(1, (c.qty||1) + delta); render(); }
+}
+function delCustom(id){
+  customs = customs.filter(x=>x.id!==id);
+  render();
+}
+
+function resetAll(){
+  if(!confirm('모든 선택을 초기화하시겠습니까?')) return;
+  Object.keys(state).forEach(k=>delete state[k]);
+  customs = [];
+  render();
+}
+
+/* ════════════════════════════════════════════════════════
+   카테고리 토글
+   ════════════════════════════════════════════════════════ */
+const openCats = {};
+function togCat(key){
+  openCats[key] = !openCats[key];
+  renderParts();
+}
+
+/* ════════════════════════════════════════════════════════
+   렌더링
+   ════════════════════════════════════════════════════════ */
+function render(){
+  renderParts();
+  renderPreview();
+}
+
+function renderParts(){
+  let html = '';
+  for(const [catKey, cat] of Object.entries(DB)){
+    const isOpen = openCats[catKey];
+    const selected = Object.values(state).find(s=>s.cat===catKey);
+    const selPrice = selected ? (selected.customPrice!==undefined ? selected.customPrice : selected.item.price) * selected.qty : 0;
+
+    html += `<div class="cat-card${isOpen?' open':''}${selected?' has-selection':''}">
+      <div class="cat-hd" onclick="togCat('${catKey}')">
+        <span class="cat-pill">${cat.label}</span>
+        <span class="cat-preview${selected?' selected':''}">${selected ? escapeHtml(selected.customName || selected.item.model) : '선택 안 됨'}</span>
+        ${selected ? `<span class="cat-price">${fmt(selPrice)}</span>` : ''}
+        <span class="cat-chev">▼</span>
+      </div>
+      <div class="cat-body">`;
+
+    cat.items.forEach(item=>{
+      const on = !!state[item.id];
+      const s = state[item.id];
+      html += `<div class="part${on?' on':''}" onclick="pick('${catKey}','${item.id}')">
+        <div class="radio"></div>
+        <div class="part-info">
+          <div class="part-model">${escapeHtml(item.model)}</div>
+        </div>
+        <div class="part-r">
+          <span class="part-price">${fmt(item.price)}</span>
+          ${on ? `<div class="qty-ctrl" onclick="event.stopPropagation()">
+            <button class="qbtn" onclick="adjQty('${item.id}',-1,event)">−</button>
+            <span class="qval">${s.qty}</span>
+            <button class="qbtn" onclick="adjQty('${item.id}',1,event)">+</button>
+          </div>` : ''}
+        </div>
+      </div>`;
+    });
+
+    html += `</div></div>`;
+  }
+  document.getElementById('partsWrap').innerHTML = html;
+}
+
+function renderPreview(){
+  const customer = document.getElementById('customerName').value.trim();
+  const project = document.getElementById('projectName').value.trim();
+  const manager = document.getElementById('managerName').value.trim();
+  const dateRaw = document.getElementById('quoteDate').value;
+
+  const rows = Object.values(state);
+  let html = '';
+
+  // 제목 영역
+  const titleText = customer || '———';
+  const projectText = project || '———';
+  html += `<div class="quote-customer ${customer?'':'empty'}">${escapeHtml(titleText)}</div>`;
+  html += `<div class="quote-meta">
+    프로젝트: <strong>${escapeHtml(projectText)}</strong>
+    &nbsp;|&nbsp; 담당: <strong>${escapeHtml(manager || '—')}</strong>
+    &nbsp;|&nbsp; ${dateRaw ? fmtDisplayDate(dateRaw) : '—'}
+    &nbsp;|&nbsp; PIASPACE
+  </div>`;
+
+  // 메타 그리드 (요약 박스)
+  let totalQty = 0;
+  let totalAmount = 0;
+  rows.forEach(r=>{
+    const p = r.customPrice!==undefined ? r.customPrice : r.item.price;
+    totalQty += r.qty;
+    totalAmount += p * r.qty;
+  });
+  customs.forEach(c=>{
+    totalQty += (c.qty||1);
+    totalAmount += (c.price||0) * (c.qty||1);
+  });
+
+  // 빈 상태
+  if(rows.length===0 && customs.length===0){
+    html += `<div class="empty-state">
+      <div class="empty-state-ico">🖥️</div>
+      <div class="empty-state-txt">왼쪽 패널에서 부품을 선택해 주세요</div>
+      <div class="empty-state-sub">선택한 부품이 견적서에 자동으로 반영됩니다</div>
+    </div>`;
+    document.getElementById('quoteCard').innerHTML = html;
+    return;
+  }
+
+  // 카테고리별 그룹화
+  const grouped = {};
+  rows.forEach(r=>{
+    if(!grouped[r.cat]) grouped[r.cat] = [];
+    grouped[r.cat].push(r);
+  });
+
+  html += `<table class="q-table">
+    <thead>
+      <tr>
+        <th style="width:55%">항목</th>
+        <th style="width:30%">산정 기준</th>
+        <th class="right" style="width:15%">금액</th>
+      </tr>
+    </thead>
+    <tbody>`;
+
+  // H/W 섹션
+  if(rows.length > 0){
+    html += `<tr class="q-section-row"><td colspan="3">H/W (하드웨어)</td></tr>`;
+    let hwSubtotal = 0;
+    for(const catKey of Object.keys(DB)){
+      if(!grouped[catKey]) continue;
+      grouped[catKey].forEach(r=>{
+        const price = r.customPrice!==undefined ? r.customPrice : r.item.price;
+        const sub = price * r.qty;
+        hwSubtotal += sub;
+        const displayName = r.customName || r.item.model;
+        html += `<tr class="q-row">
+          <td>
+            <div class="q-item-name">${escapeHtml(displayName)}</div>
+            <div class="q-item-detail">분류: <strong>${DB[r.cat].label}</strong></div>
+          </td>
+          <td>
+            <span class="q-calc">${fmtN(price)}원 × ${r.qty}</span>
+          </td>
+          <td class="right">${fmt(sub)}</td>
+        </tr>`;
+      });
+    }
+    html += `<tr class="q-subtotal">
+      <td colspan="2" style="padding-left:0;">H/W 소계</td>
+      <td class="right">${fmt(hwSubtotal)}</td>
+    </tr>`;
+  }
+
+  // 수기 항목 섹션
+  if(customs.length > 0){
+    html += `<tr class="q-section-row"><td colspan="3">추가 항목</td></tr>`;
+    let customSubtotal = 0;
+    customs.forEach(c=>{
+      const sub = (c.price||0) * (c.qty||1);
+      customSubtotal += sub;
+      html += `<tr class="q-row">
+        <td>
+          <div class="q-item-name">${escapeHtml(c.name || '(미입력 수기 항목)')}</div>
+          <div class="q-item-detail">수기 입력 항목</div>
+        </td>
+        <td>
+          <span class="q-calc">${fmtN(c.price||0)}원 × ${c.qty||1}</span>
+        </td>
+        <td class="right">${fmt(sub)}</td>
+      </tr>`;
+    });
+    html += `<tr class="q-subtotal">
+      <td colspan="2" style="padding-left:0;">추가 항목 소계</td>
+      <td class="right">${fmt(customSubtotal)}</td>
+    </tr>`;
+  }
+
+  html += `</tbody></table>`;
+
+  // 합계
+  const vat = Math.round(totalAmount * 0.1);
+  const grand = totalAmount + vat;
+
+  html += `<div class="total-card">
+    <div class="total-label">총 견적 금액 (VAT 별도)</div>
+    <div class="total-amount">${fmt(totalAmount)}</div>
+    <div class="total-vat">VAT 포함 시 ${fmt(grand)}</div>
+  </div>`;
+
+  // 수기 항목 편집 영역 (인쇄 시 숨김)
+  if(customs.length > 0){
+    html += `<div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border);" class="no-print">
+      <div style="font-size:12px;font-weight:700;color:var(--text-2);margin-bottom:10px;">수기 항목 편집</div>`;
+    customs.forEach(c=>{
+      html += `<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;padding:8px;background:var(--panel-2);border-radius:8px;border:1px solid var(--border);">
+        <input type="text" value="${escapeHtml(c.name||'')}" placeholder="항목명 (예: 설치비, 운영장비)"
+          onchange="setCustomName(${c.id}, this.value)"
+          style="flex:1;padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;font-family:inherit;outline:none;"/>
+        <button class="qbtn" onclick="adjCustomQty(${c.id},-1)">−</button>
+        <span style="font-size:12px;font-weight:700;min-width:18px;text-align:center;">${c.qty||1}</span>
+        <button class="qbtn" onclick="adjCustomQty(${c.id},1)">+</button>
+        <input type="number" value="${c.price||0}" placeholder="단가"
+          onchange="setCustomPrice(${c.id}, this.value)"
+          style="width:110px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;text-align:right;font-family:inherit;outline:none;"/>
+        <span style="font-size:11px;color:var(--text-3);">원</span>
+        <button onclick="delCustom(${c.id})" style="background:none;border:none;cursor:pointer;font-size:18px;color:var(--text-3);width:24px;height:24px;">×</button>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  document.getElementById('quoteCard').innerHTML = html;
+}
+
+/* ════════════════════════════════════════════════════════
+   유틸
+   ════════════════════════════════════════════════════════ */
+function escapeHtml(str){
+  if(str==null) return '';
+  return String(str)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
+}
+
+/* ════════════════════════════════════════════════════════
+   견적서 텍스트 생성 (텍스트 양식 / 엑셀 TSV)
+   ════════════════════════════════════════════════════════ */
+function buildQuoteData(){
+  const customer = document.getElementById('customerName').value.trim() || '———';
+  const project  = document.getElementById('projectName').value.trim() || '———';
+  const manager  = document.getElementById('managerName').value.trim() || '—';
+  const date     = document.getElementById('quoteDate').value || '—';
+
+  const rows = Object.values(state);
+  const lines = [];
+  let total = 0;
+
+  rows.forEach(r=>{
+    const price = r.customPrice!==undefined ? r.customPrice : r.item.price;
+    const sub = price * r.qty;
+    total += sub;
+    lines.push({
+      category: DB[r.cat].label,
+      name: r.customName || r.item.model,
+      qty: r.qty,
+      price: price,
+      subtotal: sub,
+    });
+  });
+  customs.forEach(c=>{
+    const sub = (c.price||0) * (c.qty||1);
+    total += sub;
+    lines.push({
+      category: '추가',
+      name: c.name || '(수기항목)',
+      qty: c.qty||1,
+      price: c.price||0,
+      subtotal: sub,
+    });
+  });
+
+  return {customer, project, manager, date, lines, total};
+}
+
+function buildTextQuote(){
+  const d = buildQuoteData();
+  const catW=8, nameW=40, qtyW=5, priceW=12, amtW=13;
+  const rp = (s, w) => {
+    const t = String(s);
+    if(t.length > w) return t.slice(0,w-1)+'…';
+    return t + ' '.repeat(Math.max(0, w-t.length));
+  };
+  const lp = (s, w) => {
+    const t = String(s);
+    return ' '.repeat(Math.max(0, w-t.length)) + t;
+  };
+
+  const sep = '─'.repeat(catW + nameW + qtyW + priceW + amtW + 4);
+  const out = [];
+  out.push(`╔════════════════════════════════════════════════════════╗`);
+  out.push(`  [PIASPACE] 견적서`);
+  out.push(`╚════════════════════════════════════════════════════════╝`);
+  out.push(`고객사:  ${d.customer}`);
+  out.push(`프로젝트: ${d.project}`);
+  out.push(`담당자:  ${d.manager}`);
+  out.push(`작성일:  ${d.date}`);
+  out.push('');
+  out.push(sep);
+  out.push(`${rp('분류',catW)} ${rp('품목명',nameW)} ${lp('수량',qtyW)} ${lp('단가',priceW)} ${lp('금액',amtW)}`);
+  out.push(sep);
+
+  d.lines.forEach(l=>{
+    out.push(`${rp(l.category,catW)} ${rp(l.name,nameW)} ${lp(l.qty+'개',qtyW)} ${lp(fmtN(l.price),priceW)} ${lp(fmtN(l.subtotal)+'원',amtW)}`);
+  });
+
+  const vat = Math.round(d.total * 0.1);
+  const grand = d.total + vat;
+  out.push(sep);
+  out.push(`${rp('소계 (VAT 별도)', catW+nameW+qtyW+priceW+3)} ${lp(fmtN(d.total)+'원',amtW)}`);
+  out.push(`${rp('부가세 (10%)', catW+nameW+qtyW+priceW+3)} ${lp(fmtN(vat)+'원',amtW)}`);
+  out.push(sep);
+  out.push(`${rp('★ 합계 (VAT 포함)', catW+nameW+qtyW+priceW+3)} ${lp(fmtN(grand)+'원',amtW)}`);
+  out.push(sep);
+
+  return out.join('\n');
+}
+
+function buildExcelTSV(){
+  const d = buildQuoteData();
+  const rows = [];
+  rows.push(['[PIASPACE] 견적서']);
+  rows.push(['고객사', d.customer]);
+  rows.push(['프로젝트', d.project]);
+  rows.push(['담당자', d.manager]);
+  rows.push(['작성일', d.date]);
+  rows.push([]);
+  rows.push(['분류', '품목명', '수량', '단가(원)', '금액(원)']);
+
+  d.lines.forEach(l=>{
+    rows.push([l.category, l.name, l.qty, l.price, l.subtotal]);
+  });
+
+  const vat = Math.round(d.total * 0.1);
+  const grand = d.total + vat;
+  rows.push([]);
+  rows.push(['', '', '', '소계 (VAT 별도)', d.total]);
+  rows.push(['', '', '', '부가세 (10%)', vat]);
+  rows.push(['', '', '', '합계 (VAT 포함)', grand]);
+
+  return rows.map(r => r.join('\t')).join('\n');
+}
+
+/* ════════════════════════════════════════════════════════
+   복사 모달
+   ════════════════════════════════════════════════════════ */
+function openCopyModal(){
+  if(Object.keys(state).length===0 && customs.length===0){
+    showToast('⚠ 선택된 항목이 없습니다');
+    return;
+  }
+  switchCopyTab(currentCopyTab);
+  document.getElementById('copyModal').classList.add('open');
+}
+function closeCopyModal(){
+  document.getElementById('copyModal').classList.remove('open');
+}
+
+function switchCopyTab(tab){
+  currentCopyTab = tab;
+  const tabText = document.getElementById('tabText');
+  const tabExcel = document.getElementById('tabExcel');
+  const ta = document.getElementById('modalTa');
+  const hint = document.getElementById('modalHint');
+
+  if(tab === 'text'){
+    tabText.className = 'modal-btn modal-btn-pri';
+    tabExcel.className = 'modal-btn modal-btn-sec';
+    ta.value = buildTextQuote();
+    hint.textContent = '메일·메신저 등에 붙여넣기 좋은 텍스트 양식입니다.';
+  }else{
+    tabExcel.className = 'modal-btn modal-btn-pri';
+    tabText.className = 'modal-btn modal-btn-sec';
+    ta.value = buildExcelTSV();
+    hint.textContent = '탭으로 구분된 형식입니다. 엑셀에 바로 붙여넣을 수 있습니다.';
+  }
+}
+
+function selectAllModal(){
+  const ta = document.getElementById('modalTa');
+  ta.focus();
+  ta.select();
+}
+
+function copyModalText(){
+  const ta = document.getElementById('modalTa');
+  ta.select();
+  const isExcel = currentCopyTab === 'excel';
+  const msg = isExcel ? '📊 엑셀용 데이터가 복사되었습니다' : '📋 텍스트 견적서가 복사되었습니다';
+
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(ta.value).then(()=>{
+      showToast(msg);
+      closeCopyModal();
+    }).catch(()=>{
+      try{
+        document.execCommand('copy');
+        showToast(msg);
+        closeCopyModal();
+      }catch(e){
+        showToast('Ctrl+C 로 복사해 주세요');
+      }
+    });
+  }else{
+    try{
+      document.execCommand('copy');
+      showToast(msg);
+      closeCopyModal();
+    }catch(e){
+      showToast('Ctrl+C 로 복사해 주세요');
+    }
+  }
+}
+
+/* ════════════════════════════════════════════════════════
+   PDF 인쇄
+   ════════════════════════════════════════════════════════ */
+function printPDF(){
+  if(Object.keys(state).length===0 && customs.length===0){
+    showToast('⚠ 선택된 항목이 없습니다');
+    return;
+  }
+  window.print();
+}
+
+/* ════════════════════════════════════════════════════════
+   토스트
+   ════════════════════════════════════════════════════════ */
+let toastTimer;
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('on');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('on'), 2800);
+}
+
+/* ════════════════════════════════════════════════════════
+   초기화 & 이벤트
+   ════════════════════════════════════════════════════════ */
+initDate();
+['customerName','projectName','managerName'].forEach(id=>{
+  document.getElementById(id).addEventListener('input', renderPreview);
+});
+
+// 모달 외부 클릭 시 닫기
+document.getElementById('copyModal').addEventListener('click', e=>{
+  if(e.target.id === 'copyModal') closeCopyModal();
+});
+
+// ESC 키로 모달 닫기
+document.addEventListener('keydown', e=>{
+  if(e.key === 'Escape') closeCopyModal();
+});
+
+render();
+</script>
+</body>
+</html>
