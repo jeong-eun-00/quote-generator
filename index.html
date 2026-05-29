@@ -448,18 +448,22 @@ input, select, textarea, button{
 .cat-pill{
   font-size:10.5px;
   font-weight:700;
-  padding:4px 10px;
+  padding:5px 10px;
   border-radius:6px;
   background:#f1f5f9;
   color:#475569;
   flex-shrink:0;
   letter-spacing:.01em;
-  min-width:58px;
+  min-width:104px;
+  max-width:140px;
   text-align:center;
   display:inline-flex;
   align-items:center;
   justify-content:center;
   font-family:inherit;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
 .cat-card.open .cat-pill,
 .cat-preview.selected ~ .cat-pill{
@@ -502,6 +506,120 @@ input, select, textarea, button{
 .cat-card.open .cat-chev{transform:rotate(180deg);color:var(--accent);}
 .cat-body{display:none;border-top:1px solid var(--border);padding:6px 8px;background:var(--panel-2);}
 .cat-card.open .cat-body{display:block;}
+
+/* 카테고리 내 검색창 */
+.cat-search{
+  position:relative;
+  margin:4px 4px 8px;
+}
+.cat-search-input{
+  width:100%;
+  padding:9px 32px 9px 12px;
+  border:1px solid var(--border);
+  border-radius:10px;
+  background:#fff;
+  font-size:12.5px;
+  color:var(--text);
+  outline:none;
+  transition:all .15s;
+  font-family:inherit;
+}
+.cat-search-input::placeholder{color:var(--text-3);}
+.cat-search-input:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px var(--accent-bg);
+}
+.cat-search-clear{
+  position:absolute;
+  right:8px;
+  top:50%;
+  transform:translateY(-50%);
+  width:22px;
+  height:22px;
+  border:none;
+  background:var(--border);
+  color:var(--text-2);
+  border-radius:50%;
+  cursor:pointer;
+  font-size:11px;
+  line-height:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:0;
+  font-family:inherit;
+}
+.cat-search-clear:hover{
+  background:var(--text-3);
+  color:#fff;
+}
+
+/* 카테고리 안 섹션 블록 */
+.sec-block{
+  margin:4px 0;
+  border-radius:8px;
+  overflow:hidden;
+}
+.sec-hd{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:8px 10px;
+  cursor:pointer;
+  user-select:none;
+  border-radius:8px;
+  transition:background .12s;
+}
+.sec-hd:hover{background:#eef2f7;}
+.sec-chev{
+  color:var(--text-3);
+  font-size:10px;
+  width:10px;
+  display:inline-block;
+  transition:transform .2s;
+  flex-shrink:0;
+}
+.sec-block.open .sec-chev{transform:rotate(90deg);color:var(--accent);}
+.sec-name{
+  flex:1;
+  font-size:11.5px;
+  font-weight:700;
+  color:var(--text-2);
+  letter-spacing:-.01em;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.sec-block.open .sec-name{color:var(--accent);}
+.sec-count{
+  font-size:10.5px;
+  font-weight:700;
+  color:var(--text-3);
+  background:#fff;
+  padding:2px 7px;
+  border-radius:99px;
+  border:1px solid var(--border);
+  flex-shrink:0;
+  letter-spacing:0;
+}
+.sec-block.open .sec-count{
+  background:var(--accent-bg);
+  color:var(--accent);
+  border-color:var(--accent-bg-2);
+}
+.sec-body{
+  display:none;
+  padding:4px 0 6px;
+}
+.sec-block.open .sec-body{display:block;}
+
+/* 검색 결과 없음 */
+.cat-empty{
+  padding:24px 12px;
+  text-align:center;
+  font-size:12.5px;
+  color:var(--text-3);
+}
 .part{
   display:flex;
   align-items:flex-start;
@@ -768,7 +886,20 @@ input, select, textarea, button{
   vertical-align:top;
 }
 .q-row td.right{text-align:right;font-weight:700;white-space:nowrap;}
-.q-item-name{font-weight:600;color:var(--text);}
+.q-item-name{
+  font-weight:600;
+  color:var(--text);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:100%;
+  cursor:default;
+}
+.q-item-name[title]:hover{
+  /* 풀네임 보고 싶을 때 호버 → 브라우저 기본 툴팁 표시 */
+  text-decoration:underline dotted var(--text-3);
+  text-underline-offset:3px;
+}
 .q-item-detail{
   font-size:11px;
   color:var(--text-3);
@@ -923,13 +1054,125 @@ input, select, textarea, button{
 ::-webkit-scrollbar-thumb{background:var(--border-2);border-radius:99px;}
 ::-webkit-scrollbar-thumb:hover{background:#94a3b8;}
 
+/* ────────────────  수기 항목 편집 패널 (인쇄 제외)  ──────────────── */
+.manual-edit-panel{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  box-shadow:var(--sh);
+  margin-top:20px;
+  padding:20px 24px;
+}
+.manual-edit-hd{
+  display:flex;
+  align-items:baseline;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-bottom:14px;
+  padding-bottom:12px;
+  border-bottom:1px solid var(--border);
+}
+.manual-edit-title{
+  font-size:14px;
+  font-weight:700;
+  color:var(--text);
+}
+.manual-edit-sub{
+  font-size:11.5px;
+  color:var(--text-3);
+  font-weight:500;
+}
+.manual-edit-list{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.manual-edit-row{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  padding:8px;
+  background:var(--panel-2);
+  border-radius:8px;
+  border:1px solid var(--border);
+}
+.manual-edit-row .me-name{
+  flex:1;
+  min-width:0;
+  padding:6px 10px;
+  border:1px solid var(--border);
+  border-radius:6px;
+  font-size:12px;
+  font-family:inherit;
+  outline:none;
+  background:#fff;
+}
+.manual-edit-row .me-qty{
+  display:flex;
+  align-items:center;
+  gap:4px;
+  flex-shrink:0;
+}
+.manual-edit-row .me-qval{
+  font-size:12px;
+  font-weight:700;
+  min-width:18px;
+  text-align:center;
+}
+.manual-edit-row .me-price{
+  width:110px;
+  padding:6px 8px;
+  border:1px solid var(--border);
+  border-radius:6px;
+  font-size:12px;
+  text-align:right;
+  font-family:inherit;
+  outline:none;
+  background:#fff;
+  flex-shrink:0;
+}
+.manual-edit-row .me-unit{
+  font-size:11px;
+  color:var(--text-3);
+  flex-shrink:0;
+}
+.manual-edit-row .me-del{
+  background:none;
+  border:none;
+  cursor:pointer;
+  font-size:18px;
+  color:var(--text-3);
+  width:24px;
+  height:24px;
+  flex-shrink:0;
+  border-radius:4px;
+  transition:background .15s, color .15s;
+}
+.manual-edit-row .me-del:hover{
+  background:#fee2e2;
+  color:var(--red);
+}
+.manual-edit-row .me-name:focus,
+.manual-edit-row .me-price:focus{
+  border-color:var(--accent);
+}
+
 /* 인쇄용 */
 @media print{
   body{background:#fff;}
-  .side, .action-row{display:none!important;}
+  .side, .action-row, .manual-edit-panel, .no-print{display:none!important;}
   .app{display:block;}
   .preview{padding:0;}
   .quote-card{box-shadow:none;border:1px solid var(--border);}
+  /* 인쇄에서는 hover가 없으므로 부품명 전체를 줄바꿈하여 모두 노출 */
+  .q-item-name{
+    white-space:normal;
+    overflow:visible;
+    text-overflow:clip;
+    text-decoration:none!important;
+    word-break:keep-all;
+    overflow-wrap:break-word;
+  }
 }
 
 /* 반응형 */
@@ -1049,6 +1292,11 @@ input, select, textarea, button{
     <div class="quote-card" id="quoteCard">
       <!-- 동적 렌더링 -->
     </div>
+
+    <!-- 수기 항목 편집 패널 (인쇄 시 숨김) -->
+    <div class="manual-edit-panel no-print" id="manualEditPanel" style="display:none;">
+      <!-- 동적 렌더링 -->
+    </div>
   </main>
 
 </div>
@@ -1083,66 +1331,1101 @@ input, select, textarea, button{
    ════════════════════════════════════════════════════════ */
 const DB = {
   CPU:{label:'CPU',color:'#475569',bg:'#f1f5f9',items:[
-    {id:'c_excel_1',model:'Intel Core i5-14400F (소비전력 TDP 65W)',price:273000},
-    {id:'c_excel_2',model:'Intel Core i7-14700K (TDP 105W)',price:487980},
-    {id:'c_excel_3',model:'2CPU · Intel Gen5 Xeon Scalable 4510Y (12-core, 2.4GHz, 30M)',price:3170000},
-    {id:'c_excel_4',model:'2CPU · Intel Gen5 Xeon Scalable 6526Y (16-core, 2.8GHz, 37.5M)',price:4074000},
-    {id:'c1',model:'인텔 코어 i5-14400 (랩터레이크)',price:345300},
-    {id:'c3',model:'인텔 코어 i5-14400F (랩터레이크)',price:259000},
-    {id:'c5',model:'인텔 코어 울트라5 225F (애로우레이크)',price:243000},
-    {id:'c6',model:'인텔 코어 울트라7 265KF (애로우레이크)',price:390000},
-    {id:'c7',model:'인텔 코어 i7-14700F (랩터레이크)',price:499000},
-    {id:'c9',model:'인텔 코어 i7-14700KF',price:506000},
-    {id:'c10',model:'AMD 라이젠 TR PRO 9955WX (워크스테이션)',price:2740000},
-    {id:'c11',model:'AMD 라이젠 TR PRO 7955WX (16C) 워크스테이션',price:2780000},
+    {id:'p1',section:'인텔 셀러론·펜티엄 (LGA 1200)',model:'[인텔] 코멧S 셀러론 G5905 3.5GHz [2코어 2쓰레드]',price:49900},
+    {id:'p2',section:'인텔 셀러론·펜티엄 (LGA 1200)',model:'[인텔] 펜티엄 골드 G6400 4.0GHz [2코어 4쓰레드]',price:83500},
+    {id:'p3',section:'인텔 랩터레이크 14세대 (LGA 1700)',model:'[인텔] 랩터R i3-14세대 14100F 3.5GHz [4코어8쓰레드] 터보4.7GHz',price:164100},
+    {id:'p4',section:'인텔 랩터레이크 14세대 (LGA 1700)',model:'[인텔] 랩터R i3-14세대 14100F 3.5GHz [4코어8쓰레드] 터보4.7GHz (정품)',price:177200},
+    {id:'p5',section:'인텔 랩터레이크 14세대 (LGA 1700)',model:'[인텔] 랩터R i3-14세대 14100 3.5GHz [4코어8쓰레드] 터보4.7GHz',price:195700},
+    {id:'p6',section:'인텔 랩터레이크 14세대 (LGA 1700)',model:'[인텔] 랩터R i5-14세대 14400F 2.5GHz [10코어16쓰레드] 터보4.7GHz',price:242100},
+    {id:'p7',section:'인텔 랩터레이크 14세대 (LGA 1700)',model:'[인텔] 랩터R i5-14세대 14400 2.5GHz [10코어16쓰레드] 터보4.7GHz',price:333600},
+    {id:'p8',section:'인텔 랩터레이크 14세대 (LGA 1700)',model:'[인텔] 랩터R i5-14세대 14600KF 3.5GHz [14코어20쓰레드] 터보5.3GHz',price:376100},
+    {id:'p9',section:'인텔 랩터레이크 14세대 (LGA 1700)',model:'[인텔] 랩터R i5-14세대 14600K 3.5GHz [14코어20쓰레드] 터보5.3GHz Hit',price:394100},
+    {id:'p10',section:'인텔 랩터레이크 14세대 (LGA 1700)',model:'[인텔] 랩터R i5-14세대 14600K 3.5GHz [14코어20쓰레드] 터보5.3GHz (정품)',price:411800},
+    {id:'p11',section:'인텔 랩터레이크 14세대 (LGA 1700)',model:'[인텔] 랩터R i7-14세대 14700F 2.1GHz [20코어28쓰레드] 터보5.4GHz',price:481800},
+    {id:'p12',section:'인텔 랩터레이크 14세대 (LGA 1700)',model:'[인텔] 랩터R i7-14세대 14700KF 3.4GHz [20코어28쓰레드] 터보5.6GHz Hit',price:514400},
+    {id:'p13',section:'인텔 랩터레이크 14세대 (LGA 1700)',model:'[인텔] 랩터R i7-14세대 14700F 2.1GHz [20코어28쓰레드] 터보5.4GHz (정품)',price:534100},
+    {id:'p14',section:'인텔 랩터레이크 14세대 (LGA 1700)',model:'[인텔] 랩터R i7-14세대 14700KF 3.4GHz [20코어28쓰레드] 터보5.6GHz(정품)',price:577700},
+    {id:'p15',section:'인텔 랩터레이크 14세대 (LGA 1700)',model:'[인텔] 랩터R i7-14세대 14700 2.1GHz [20코어28쓰레드] 터보5.4GHz',price:597400},
+    {id:'p16',section:'인텔 랩터레이크 14세대 (LGA 1700)',model:'[인텔] 랩터R i7-14세대 14700K 3.4GHz [20코어28쓰레드] 터보5.6GHz',price:685600},
+    {id:'p17',section:'인텔 랩터레이크 14세대 (LGA 1700)',model:'[인텔] 랩터R i7-14세대 14700K 3.4GHz [20코어28쓰레드] (정품) 5.3GHz Overclocking (Z790 보드만 지원)',price:715600},
+    {id:'p18',section:'인텔 랩터레이크 14세대 (LGA 1700)',model:'[인텔] 랩터R i9-14세대 14900KF 3.2GHz [24코어32쓰레드] 터보6.0GHz',price:717200},
+    {id:'p19',section:'인텔 랩터레이크 14세대 (LGA 1700)',model:'[인텔] 랩터R i9-14세대 14900F 2.0GHz [24코어32쓰레드] 터보5.8GHz',price:765300},
+    {id:'p20',section:'인텔 랩터레이크 14세대 (LGA 1700)',model:'[인텔] 랩터R i9-14세대 14900KF 3.2GHz [24코어32쓰레드] 터보6.0GHz(정품)',price:768500},
+    {id:'p21',section:'인텔 랩터레이크 14세대 (LGA 1700)',model:'[인텔] 랩터R i9-14세대 14900K 3.2GHz [24코어32쓰레드] 터보6.0GHz',price:796800},
+    {id:'p22',section:'인텔 랩터레이크 14세대 (LGA 1700)',model:'[인텔] 랩터R i9-14세대 14900K 3.2GHz [24코어32쓰레드] 5.4GHz Overclocking (Z790 보드만 지원)',price:842100},
+    {id:'p23',section:'인텔 애로우레이크 15세대 (LGA 1851)',model:'[인텔] 코어 울트라5 225F 3.3GHz [10코어 10쓰레드] 터보 4.9GHz',price:206700},
+    {id:'p24',section:'인텔 애로우레이크 15세대 (LGA 1851)',model:'[인텔] 코어 울트라5 225F 3.3GHz [10코어 10쓰레드] 터보 4.9GHz (정품)',price:237400},
+    {id:'p25',section:'인텔 애로우레이크 15세대 (LGA 1851)',model:'[인텔] 코어 울트라5 225 3.3GHz [10코어 10쓰레드] 터보 4.9GHz',price:267500},
+    {id:'p26',section:'인텔 애로우레이크 15세대 (LGA 1851)',model:'[인텔] 코어 울트라5 245KF 4.2GHz [14코어 14쓰레드] 터보 5.2GHz',price:268100},
+    {id:'p27',section:'인텔 애로우레이크 15세대 (LGA 1851)',model:'[인텔] 코어 울트라5 225 3.3GHz [10코어 10쓰레드] 터보 4.9GHz (정품)',price:296400},
+    {id:'p28',section:'인텔 애로우레이크 15세대 (LGA 1851)',model:'[인텔] 코어 울트라5 245KF 4.2GHz [14코어 14쓰레드] 터보 5.2GHz (정품)',price:302800},
+    {id:'p29',section:'인텔 애로우레이크 15세대 (LGA 1851)',model:'[인텔] 코어 울트라5 245K 4.2GHz [14코어 14쓰레드] 터보 5.2GHz',price:319800},
+    {id:'p30',section:'인텔 애로우레이크 15세대 (LGA 1851)',model:'[인텔] 코어 울트라5 250KF Plus 4.2GHz [18코어 18쓰레드] 터보 5.3GHz (정품) New',price:351900},
+    {id:'p31',section:'인텔 애로우레이크 15세대 (LGA 1851)',model:'[인텔] 코어 울트라5 245K 4.2GHz [14코어 14쓰레드] 터보 5.2GHz (정품)',price:352100},
+    {id:'p32',section:'인텔 애로우레이크 15세대 (LGA 1851)',model:'[인텔] 코어 울트라5 250K Plus 4.2GHz [18코어 18쓰레드] 터보 5.3GHz New',price:377700},
+    {id:'p33',section:'인텔 애로우레이크 15세대 (LGA 1851)',model:'[인텔] 코어 울트라5 250K Plus [18코어 18쓰레드] E코어 4.8GHz P코어 5.2GHz Overclocking (Z890 보드만 지원)',price:382400},
+    {id:'p34',section:'인텔 애로우레이크 15세대 (LGA 1851)',model:'[인텔] 코어 울트라7 265KF 3.9GHz [20코어 20쓰레드] 터보 5.5GHz Hit',price:428200},
+    {id:'p35',section:'인텔 애로우레이크 15세대 (LGA 1851)',model:'[인텔] 코어 울트라7 265K 3.9GHz [20코어 20쓰레드] 터보 5.5GHz',price:468800},
+    {id:'p36',section:'인텔 애로우레이크 15세대 (LGA 1851)',model:'[인텔] 코어 울트라7 265KF 3.9GHz [20코어 20쓰레드] 터보 5.5GHz (정품)',price:469600},
+    {id:'p37',section:'인텔 애로우레이크 15세대 (LGA 1851)',model:'[인텔] 코어 울트라7 270K Plus 3.7GHz [24코어 24쓰레드] 터보 5.5GHz New',price:505100},
+    {id:'p38',section:'인텔 애로우레이크 15세대 (LGA 1851)',model:'[인텔] 코어 울트라7 265K 3.9GHz [20코어 20쓰레드] 터보 5.5GHz (정품)',price:508300},
+    {id:'p39',section:'인텔 애로우레이크 15세대 (LGA 1851)',model:'[인텔] 코어 울트라7 265K 3.9GHz [20코어 20쓰레드] (정품) 5.3GHz Overclocking (Z890 일부 보드만 지원)',price:532600},
+    {id:'p40',section:'인텔 애로우레이크 15세대 (LGA 1851)',model:'[인텔] 코어 울트라7 270K Plus 3.7GHz [24코어 24쓰레드] 터보 5.5GHz New',price:542500},
+    {id:'p41',section:'인텔 애로우레이크 15세대 (LGA 1851)',model:'[인텔] 코어 울트라7 270K Plus [24코어 24쓰레드] E코어 4.9GHz P코어 5.5GHz Overclocking (Z890 보드만 지원)',price:545100},
+    {id:'p42',section:'인텔 애로우레이크 15세대 (LGA 1851)',model:'[인텔] 코어 울트라9 285K 3.7GHz [24코어 24쓰레드] 터보 5.7GHz',price:892400},
+    {id:'p43',section:'인텔 애로우레이크 15세대 (LGA 1851)',model:'[인텔] 코어 울트라9 285 2.5GHz [24코어 24쓰레드] 터보 5.6GHz (정품)',price:911600},
+    {id:'p44',section:'인텔 애로우레이크 15세대 (LGA 1851)',model:'[인텔] 코어 울트라9 285K 3.7GHz [24코어 24쓰레드] 터보 5.7GHz (정품)',price:932800},
+    {id:'p45',section:'인텔 애로우레이크 15세대 (LGA 1851)',model:'[인텔] 코어 울트라9 285K 3.7GHz [24코어 24쓰레드] (정품) 5.5GHz Overclocking (Z890 보드만 지원)',price:962800},
+    {id:'p46',section:'인텔 제온 시리즈 (사파이어 래피드, LGA4677)',model:'[인텔] 제온 w5-2465X (사파이어 래피드) [16코어 32쓰레드]',price:2280000},
+    {id:'p47',section:'인텔 제온 시리즈 (사파이어 래피드, LGA4677)',model:'[인텔] 제온 w5-3435X (사파이어 래피드) [16코어 32쓰레드]',price:2995000},
+    {id:'p48',section:'인텔 제온 시리즈 (사파이어 래피드, LGA4677)',model:'[인텔] 제온 w7-3465X (사파이어 래피드) [28코어 56쓰레드] AS 3년',price:5020500},
   ]},
-  RAM:{label:'RAM',color:'#475569',bg:'#f1f5f9',items:[
-    {id:'r_excel_1',model:'DDR5 4800MHz 8GB',price:178000},
-    {id:'r_excel_2',model:'DDR5 4800MHz 16GB',price:305390},
-    {id:'r_excel_3',model:'DDR5 5200MHz 16GB',price:305390},
-    {id:'r_excel_4',model:'DDR5 5600MHz 32GB',price:305390},
-    {id:'r_excel_5',model:'32GB DDR5 Registered ECC PC5 4800',price:1621000},
-    {id:'r_excel_6',model:'64GB DDR5 Registered ECC PC5 4800 (32GB x2)',price:3242000},
-    {id:'r1',model:'KLEVV DDR5-5600 CL46 (16GB)',price:330000},
-    {id:'r2',model:'삼성 DDR5-5600 16GB',price:365000},
-    {id:'r3',model:'SK하이닉스 DDR5 PC5-44800 16GB',price:374000},
-    {id:'r4',model:'TeamGroup DDR5-5600 CL46 Elite 서린 (16GB)',price:354000},
-    {id:'r5',model:'삼성 DDR5-5600 32GB',price:730000},
-    {id:'r6',model:'삼성 DDR5-4800 ECC/REG 64GB (서버/WS용)',price:3486000},
+  CPU_COOLER:{label:'CPU쿨러',color:'#475569',bg:'#f1f5f9',items:[
+    {id:'p49',section:'보급형(공랭) 셀러론~i3·라이젠3',model:'정품 기본 쿨러 (정품 CPU 포함된 쿨러, 일부상품)',price:0},
+    {id:'p50',section:'보급형(공랭) 셀러론~i3·라이젠3',model:'[EVERCOOL] COOLMARKER CM-1700 SCREW',price:5800},
+    {id:'p51',section:'보급형(공랭) 셀러론~i3·라이젠3',model:'[리드쿨] JD-950 블랙 PWM 인텔전용쿨러',price:5900},
+    {id:'p52',section:'보급형(공랭) 셀러론~i3·라이젠3',model:'[COOLCOM] I-17X RGB COPPER (셀러론~i5 권장)',price:7600},
+    {id:'p53',section:'보급형(공랭) 셀러론~i3·라이젠3',model:'[잘만] ZM-LPH40',price:7800},
+    {id:'p54',section:'보급형(공랭) 셀러론~i3·라이젠3',model:'[PNC파트너] EVEREST BK092 BK092 WHITE LED',price:9700},
+    {id:'p55',section:'보급형(공랭) 셀러론~i3·라이젠3',model:'[인텔] RM1 정품쿨러 [12,13,14세대전용] (셀러론~i5 권장)',price:12500},
+    {id:'p56',section:'보급형(공랭) 셀러론~i3·라이젠3',model:'[인텔] RM2 정품쿨러 [애로우레이크 전용] (U5 권장)',price:12500},
+    {id:'p57',section:'보급형(공랭) 셀러론~i3·라이젠3',model:'[잘만] CNPS4X V2 (블랙)',price:16500},
+    {id:'p58',section:'보급형(공랭) 셀러론~i3·라이젠3',model:'[darkFlash] ELLSWORTH S31 (블랙)',price:18500},
+    {id:'p59',section:'보급형(공랭) 셀러론~i3·라이젠3',model:'[darkFlash] ELLSWORTH S31 (화이트)',price:18500},
+    {id:'p60',section:'보급형(공랭) 셀러론~i3·라이젠3',model:'[JIUSHARK] JF100RS Crystal (블랙)',price:19000},
+    {id:'p61',section:'보급형(공랭) 셀러론~i3·라이젠3',model:'[JONSBO] CR-1300 EVO RGB (블랙)',price:19000},
+    {id:'p62',section:'보급형(공랭) 셀러론~i3·라이젠3',model:'[JONSBO] CR-1300 EVO RGB (화이트)',price:19000},
+    {id:'p63',section:'보급형(공랭) 셀러론~i3·라이젠3',model:'[발키리] AQ125 (블랙)',price:19500},
+    {id:'p64',section:'보급형(공랭) 셀러론~i3·라이젠3',model:'[JIUSHARK] JF100RS Crystal (화이트)',price:20000},
+    {id:'p65',section:'보급형(공랭) 셀러론~i3·라이젠3',model:'[JIUSHARK] JF100RS Crystal Auto RGB (블랙)',price:21000},
+    {id:'p66',section:'보급형(공랭) 셀러론~i3·라이젠3',model:'[JIUSHARK] JF100RS Crystal Auto RGB (화이트)',price:21000},
+    {id:'p67',section:'보급형(공랭) 셀러론~i3·라이젠3',model:'[발키리] AQ125 (화이트)',price:21000},
+    {id:'p68',section:'보급형(공랭) 셀러론~i3·라이젠3',model:'[3RSYS] Socoool RC250 ARGB (블랙)',price:22000},
+    {id:'p69',section:'보급형(공랭) 셀러론~i3·라이젠3',model:'[JIUSHARK] JF100RS Crystal ARGB (화이트)',price:22000},
+    {id:'p70',section:'보급형(공랭) 셀러론~i3·라이젠3',model:'[싸이번] SNOWMAN MT4-SE ARGB (블랙) Hit',price:22000},
+    {id:'p71',section:'보급형(공랭) 셀러론~i3·라이젠3',model:'[싸이번] SNOWMAN MT4-SE ARGB (화이트) Hit',price:22000},
+    {id:'p72',section:'보급형(공랭) 셀러론~i3·라이젠3',model:'[ID-COOLING] SE-214-XT (Non RGB)',price:23000},
+    {id:'p73',section:'보급형(공랭) 셀러론~i3·라이젠3',model:'[DEEPCOOL] AG400 G2',price:24000},
+    {id:'p74',section:'보급형(공랭) 셀러론~i3·라이젠3',model:'[ID-COOLING] SE-214-XT ARGB 데이븐 (화이트)',price:24800},
+    {id:'p75',section:'보급형(공랭) 셀러론~i3·라이젠3',model:'[ID-COOLING] SE-214-XT ARGB 데이븐 (블랙)',price:24800},
+    {id:'p76',section:'보급형(공랭) 셀러론~i3·라이젠3',model:'[쿨러마스터] HYPER 411 NANO',price:25800},
+    {id:'p77',section:'보급형(공랭) 셀러론~i3·라이젠3',model:'[3RSYS] Socoool RC750N PWM (슬림/LP타입)',price:27600},
+    {id:'p78',section:'보급형(공랭) 셀러론~i3·라이젠3',model:'[NOCTUA] NH-U9S',price:107700},
+    {id:'p79',section:'중급형(공랭) i7·라이젠3~7',model:'[쿨러마스터] HYPER 212 HALO (화이트)',price:23000},
+    {id:'p80',section:'중급형(공랭) i7·라이젠3~7',model:'[인텔] Laminar RH1 [인텔12,13세대 Non K i9 모델 전용쿨러]',price:24000},
+    {id:'p81',section:'중급형(공랭) i7·라이젠3~7',model:'[MSI] MAG 코어프로저 AA13 ARGB (블랙)',price:24500},
+    {id:'p82',section:'중급형(공랭) i7·라이젠3~7',model:'[MSI] MAG 코어프로저 AA13 ARGB (화이트)',price:24500},
+    {id:'p83',section:'중급형(공랭) i7·라이젠3~7',model:'[JIUSHARK] JF100 Crystal (블랙) TDP 230W',price:25000},
+    {id:'p84',section:'중급형(공랭) i7·라이젠3~7',model:'[잘만] CNPS9X PERFORMA PLUS (블랙)',price:26500},
+    {id:'p85',section:'중급형(공랭) i7·라이젠3~7',model:'[darkFlash] Ellsworth S21 (블랙)',price:26900},
+    {id:'p86',section:'중급형(공랭) i7·라이젠3~7',model:'[JIUSHARK] JF100 (블랙) TDP 230W',price:27900},
+    {id:'p87',section:'중급형(공랭) i7·라이젠3~7',model:'[JIUSHARK] JF100 (화이트)',price:28500},
+    {id:'p88',section:'중급형(공랭) i7·라이젠3~7',model:'[JIUSHARK] JF200MINI Crystal (블랙)',price:29500},
+    {id:'p89',section:'중급형(공랭) i7·라이젠3~7',model:'[JIUSHARK] JF200MINI Crystal (화이트)',price:29500},
+    {id:'p90',section:'중급형(공랭) i7·라이젠3~7',model:'[PCCOOLER] PALADIN 400 (블랙)',price:29900},
+    {id:'p91',section:'중급형(공랭) i7·라이젠3~7',model:'[PCCOOLER] PALADIN 400 (화이트)',price:32100},
+    {id:'p92',section:'중급형(공랭) i7·라이젠3~7',model:'[JIUSHARK] JF500 Ruby ARGB (블랙)',price:32500},
+    {id:'p93',section:'중급형(공랭) i7·라이젠3~7',model:'[JIUSHARK] JF500 Ruby ARGB (화이트)',price:32500},
+    {id:'p94',section:'중급형(공랭) i7·라이젠3~7',model:'[JIUSHARK] JF200MINI Crystal Auto RGB (블랙)',price:33000},
+    {id:'p95',section:'중급형(공랭) i7·라이젠3~7',model:'[JIUSHARK] JF200MINI Crystal Auto RGB (화이트)',price:33000},
+    {id:'p96',section:'중급형(공랭) i7·라이젠3~7',model:'[잘만] CNPS9X PERFORMA ARGB (블랙)',price:36000},
+    {id:'p97',section:'중급형(공랭) i7·라이젠3~7',model:'[Thermalright] Peerless Assassin 90 SE 서린 (블랙)',price:37500},
+    {id:'p98',section:'중급형(공랭) i7·라이젠3~7',model:'[Thermalright] Peerless Assassin 90 SE 서린 (화이트)',price:37500},
+    {id:'p99',section:'중급형(공랭) i7·라이젠3~7',model:'[잘만] CNPS9X PERFORMA ARGB (화이트)',price:38500},
+    {id:'p100',section:'중급형(공랭) i7·라이젠3~7',model:'[DEEPCOOL] AG620 G2',price:40800},
+    {id:'p101',section:'중급형(공랭) i7·라이젠3~7',model:'[쿨러마스터] V4 Alpha 3DHP (블랙)',price:43200},
+    {id:'p102',section:'최고급형(공랭) i5~i9·라이젠7~9',model:'[ID-COOLING] FROZN A620 PRO SE',price:39000},
+    {id:'p103',section:'최고급형(공랭) i5~i9·라이젠7~9',model:'[PCCOOLER] CPS RT620 PRO 카본스틸 (블랙)',price:39900},
+    {id:'p104',section:'최고급형(공랭) i5~i9·라이젠7~9',model:'[Thermalright] Peerless Assassin 120 SE',price:40500},
+    {id:'p105',section:'최고급형(공랭) i5~i9·라이젠7~9',model:'[3RSYS] Socoool RC1400 Quiet 쌍철봉 (블랙)',price:40700},
+    {id:'p106',section:'최고급형(공랭) i5~i9·라이젠7~9',model:'[3RSYS] Socoool RC1400 Quiet 쌍철봉 (화이트)',price:40700},
+    {id:'p107',section:'최고급형(공랭) i5~i9·라이젠7~9',model:'[PCCOOLER] CPS RT620 PRO 카본스틸 (화이트)',price:41900},
+    {id:'p108',section:'최고급형(공랭) i5~i9·라이젠7~9',model:'[ID-COOLING] FROZN A620 PRO SE ARGB (블랙)',price:43000},
+    {id:'p109',section:'최고급형(공랭) i5~i9·라이젠7~9',model:'[Thermalright] Peerless Assassin 120 SE ARGB (블랙)',price:44550},
+    {id:'p110',section:'최고급형(공랭) i5~i9·라이젠7~9',model:'[darkFlash] Ellsworth D21 (블랙)',price:45000},
+    {id:'p111',section:'최고급형(공랭) i5~i9·라이젠7~9',model:'[PCCOOLER] CPS RT620 PRO ARGB 카본스틸 (블랙)',price:45900},
+    {id:'p112',section:'최고급형(공랭) i5~i9·라이젠7~9',model:'[PCCOOLER] CPS RT620 PRO ARGB 카본스틸 (화이트)',price:48900},
+    {id:'p113',section:'최고급형(공랭) i5~i9·라이젠7~9',model:'[Thermalright] Peerless Assassin 120 SE ARGB (화이트)',price:49000},
+    {id:'p114',section:'최고급형(공랭) i5~i9·라이젠7~9',model:'[darkFlash] Ellsworth D21 ARGB (블랙)',price:49500},
+    {id:'p115',section:'최고급형(공랭) i5~i9·라이젠7~9',model:'[잘만] CNPS14X DUO (TDP 270W)',price:49900},
+    {id:'p116',section:'최고급형(공랭) i5~i9·라이젠7~9',model:'[JIUSHARK] JF200S (블랙)',price:51800},
+    {id:'p117',section:'최고급형(공랭) i5~i9·라이젠7~9',model:'[darkFlash] Ellsworth D21 ARGB (화이트)',price:52000},
+    {id:'p118',section:'최고급형(공랭) i5~i9·라이젠7~9',model:'[DEEPCOOL] AG620 DIGITAL',price:59400},
+    {id:'p119',section:'최고급형(공랭) i5~i9·라이젠7~9',model:'[타무즈] T880-V4D (블랙)',price:59400},
+    {id:'p120',section:'최고급형(공랭) i5~i9·라이젠7~9',model:'[JIUSHARK] JF800 Diamond ARGB (화이트)',price:63500},
+    {id:'p121',section:'최고급형(공랭) i5~i9·라이젠7~9',model:'[PentaWave] Z06D (블랙) TDP 270W',price:67200},
+    {id:'p122',section:'최고급형(공랭) i5~i9·라이젠7~9',model:'[PentaWave] Z06D (화이트) TDP 270W',price:69900},
+    {id:'p123',section:'최고급형(공랭) i5~i9·라이젠7~9',model:'[3RSYS] Socoool RC-1800 Quiet 솔더링 (화이트)',price:76000},
+    {id:'p124',section:'최고급형(공랭) i5~i9·라이젠7~9',model:'[잘만] ZET 5 솔더링 (블랙)',price:77000},
+    {id:'p125',section:'최고급형(공랭) i5~i9·라이젠7~9',model:'[싸이번] SNOWMAN AX660 PRO-ARGB 뚜까리6 (블랙)',price:78500},
+    {id:'p126',section:'최고급형(공랭) i5~i9·라이젠7~9',model:'[싸이번] SNOWMAN AX660 PRO-ARGB 뚜까리6 (화이트)',price:78500},
+    {id:'p127',section:'최고급형(공랭) i5~i9·라이젠7~9',model:'[잘만] ZET 5 솔더링 (화이트)',price:79000},
+    {id:'p128',section:'최고급형(공랭) i5~i9·라이젠7~9',model:'[Thermalright] Peerless Assassin 120 Digital ARGB (블랙)',price:79900},
+    {id:'p129',section:'최고급형(공랭) i5~i9·라이젠7~9',model:'[Thermalright] Peerless Assassin 120 Digital ARGB (화이트)',price:79900},
+    {id:'p130',section:'최고급형(공랭) i5~i9·라이젠7~9',model:'[3RSYS] Socoool RC1900N 솔더링 (블랙)',price:81000},
+    {id:'p131',section:'최고급형(공랭) i5~i9·라이젠7~9',model:'[쿨러마스터] HYPER 612 APEX (블랙)',price:81800},
+    {id:'p132',section:'최고급형(공랭) i5~i9·라이젠7~9',model:'[3RSYS] Socoool RC1910N Quiet 쌍철봉 (블랙)',price:83500},
+    {id:'p133',section:'최고급형(공랭) i5~i9·라이젠7~9',model:'[싸이번] SNOWMAN AX880 PRO-ARGB 뚜까리8 (블랙)',price:85500},
+    {id:'p134',section:'최고급형(공랭) i5~i9·라이젠7~9',model:'[싸이번] SNOWMAN AX880 PRO-ARGB 뚜까리8 (화이트)',price:85500},
+    {id:'p135',section:'최고급형(공랭) i5~i9·라이젠7~9',model:'[3RSYS] Socoool RC1900 ARGB 솔더링 (블랙)',price:85600},
+    {id:'p136',section:'최고급형(공랭) i5~i9·라이젠7~9',model:'[3RSYS] Socoool RC1910N Quiet 쌍철봉 (화이트)',price:86500},
+    {id:'p137',section:'최고급형(공랭) i5~i9·라이젠7~9',model:'[쿨러마스터] HYPER 612 APEX (화이트)',price:87400},
+    {id:'p138',section:'최고급형(공랭) i5~i9·라이젠7~9',model:'[3RSYS] Socoool RC1900 ARGB 솔더링 (화이트)',price:88400},
+    {id:'p139',section:'최고급형(공랭) i5~i9·라이젠7~9',model:'[DEEPCOOL] AK620 G2 DIGITAL NYX',price:96000},
+    {id:'p140',section:'최고급형(공랭) i5~i9·라이젠7~9',model:'[Thermalright] Peerless Assassin 120 VISION ARGB (블랙)',price:99900},
+    {id:'p141',section:'최고급형(공랭) i5~i9·라이젠7~9',model:'[Thermalright] Peerless Assassin 120 VISION ARGB (화이트)',price:99900},
+    {id:'p142',section:'최고급형(공랭) i5~i9·라이젠7~9',model:'[NOCTUA] NH-D12L',price:157900},
+    {id:'p143',section:'최고급형(공랭) i5~i9·라이젠7~9',model:'[DEEPCOOL] ASSASSIN VC ELITE (블랙)',price:159900},
+    {id:'p144',section:'최고급형(공랭) i5~i9·라이젠7~9',model:'[DEEPCOOL] ASSASSIN VC ELITE (화이트)',price:159900},
+    {id:'p145',section:'최고급형(공랭) i5~i9·라이젠7~9',model:'[NOCTUA] NH-D15',price:170200},
+    {id:'p146',section:'최고급형(공랭) i5~i9·라이젠7~9',model:'[PCCOOLER] CPS RZ820 (화이트)',price:172000},
+    {id:'p147',section:'최고급형(공랭) i5~i9·라이젠7~9',model:'[NOCTUA] NH-D15 Chromax 블랙',price:186800},
+    {id:'p148',section:'최고급형(공랭) i5~i9·라이젠7~9',model:'[NOCTUA] NH-D15 G2',price:244200},
+    {id:'p149',section:'수냉(AIO 240)',model:'[PNC PARTNER] EVEREST REMOTE 240 ARGB (블랙)',price:45000},
+    {id:'p150',section:'수냉(AIO 240)',model:'[맵코] P360 POSEIDON ARGB',price:62800},
+    {id:'p151',section:'수냉(AIO 240)',model:'[darkFlash] NEBULA DN-240 ARGB (블랙)',price:65000},
+    {id:'p152',section:'수냉(AIO 240)',model:'[darkFlash] NEBULA DN-240 ARGB (화이트)',price:65000},
+    {id:'p153',section:'수냉(AIO 240)',model:'[MSI] MAG 코어리퀴드 A13 240 (블랙)',price:65000},
+    {id:'p154',section:'수냉(AIO 360)',model:'[발키리] GLA-360 DIGITAL ARGB (블랙)',price:95000},
+    {id:'p155',section:'수냉(AIO 360)',model:'[darkFlash] NEBULA DN-360D ARGB (블랙)',price:95800},
+    {id:'p156',section:'수냉(AIO 360)',model:'[darkFlash] NEBULA DN-360D ARGB (화이트)',price:99000},
+    {id:'p157',section:'수냉(AIO 360)',model:'[발키리] GLA-360 DIGITAL ARGB (화이트)',price:99400},
+    {id:'p158',section:'수냉(AIO 360)',model:'[DEEPCOOL] LT360 VISION ARGB (블랙)',price:102000},
+    {id:'p159',section:'수냉(AIO 360)',model:'[JONSBO] TH-360 (블랙)',price:103000},
+    {id:'p160',section:'수냉(AIO 360)',model:'[JONSBO] TH-360 (화이트)',price:103000},
+    {id:'p161',section:'수냉(AIO 360)',model:'[맵코] 포세이돈 P360L LCD ARGB 디스플레이 (블랙)',price:116500},
+    {id:'p162',section:'수냉(AIO 360)',model:'[쿨러마스터] MasterLiquid PL360 FLUX (블랙)',price:119000},
+    {id:'p163',section:'수냉(AIO 360)',model:'[쿨러마스터] MASTERLIQUID 360 CORE II ARGB (블랙)',price:123200},
+    {id:'p164',section:'수냉(AIO 360)',model:'[잘만] Alpha II V2 A36 (블랙)',price:126500},
+    {id:'p165',section:'수냉(AIO 360)',model:'[맵코] 포세이돈 P360L LCD ARGB 디스플레이 (화이트)',price:127700},
+    {id:'p166',section:'수냉(AIO 360)',model:'[darkFlash] NEBULA DN-360S ARGB (화이트)',price:129500},
+    {id:'p167',section:'수냉(AIO 360)',model:'[쿨러마스터] MASTERLIQUID 360 CORE II ARGB (화이트)',price:129900},
+    {id:'p168',section:'수냉(AIO 360)',model:'[3RSYS] 라니 SF 360 ARGB (블랙)',price:130000},
+    {id:'p169',section:'수냉(AIO 360)',model:'[3RSYS] 라니 SF 360 ARGB (화이트)',price:130000},
+    {id:'p170',section:'수냉(AIO 360)',model:'[ASUS] PRIME LC 360 ARGB (화이트)',price:146000},
+    {id:'p171',section:'수냉(AIO 360)',model:'[발키리] B360-GT LCD ARGB (블랙)',price:148400},
+    {id:'p172',section:'수냉(AIO 360)',model:'[Thermalright] FROZEN WARFRAME 360 (블랙)',price:151000},
+    {id:'p173',section:'수냉(AIO 360)',model:'[쿨러마스터] MasterLiquid Core LCD 4인치 360 ARGB (블랙)',price:152300},
+    {id:'p174',section:'수냉(AIO 360)',model:'[쿨러마스터] MasterLiquid Core LCD 4인치 360 ARGB (화이트)',price:152300},
+    {id:'p175',section:'수냉(AIO 360)',model:'[MSI] MAG 코어리퀴드 I360 (화이트)',price:152800},
+    {id:'p176',section:'수냉(AIO 360)',model:'[발키리] B360-GT LCD ARGB (화이트)',price:154500},
+    {id:'p177',section:'수냉(AIO 360)',model:'[Thermalright] FROZEN WARFRAME 360 ARGB (블랙)',price:164000},
+    {id:'p178',section:'수냉(AIO 360)',model:'[Thermalright] FROZEN WARFRAME 360 ARGB (화이트)',price:165500},
+    {id:'p179',section:'수냉(AIO 360)',model:'[CORSAIR] NAUTILUS 360 RS ARGB (블랙)',price:169000},
+    {id:'p180',section:'수냉(AIO 360)',model:'[CORSAIR] NAUTILUS 360 RS ARGB (화이트)',price:169000},
+    {id:'p181',section:'수냉(AIO 360)',model:'[잘만] ALPHA II DS A36 (블랙)',price:170300},
+    {id:'p182',section:'수냉(AIO 360)',model:'[쿨러마스터] MASTERLIQUID 360 ATMOS Stealth',price:174800},
+    {id:'p183',section:'수냉(AIO 360)',model:'[3RSYS] 라니 WV 360 ARGB (블랙)',price:175000},
+    {id:'p184',section:'수냉(AIO 360)',model:'[3RSYS] 라니 WV 360 ARGB (화이트)',price:175000},
+    {id:'p185',section:'수냉(AIO 360)',model:'[Thermalright] FROZEN WARFRAME 420 ARGB (블랙) [140mm x3] 일부 케이스에만 장착 가능',price:178500},
+    {id:'p186',section:'수냉(AIO 360)',model:'[Thermalright] FROZEN WARFRAME 420 ARGB (화이트) [140mm x3] 일부 케이스에만 장착 가능',price:181500},
+    {id:'p187',section:'수냉(AIO 360)',model:'[잘만] ALPHA II DS A36 (화이트)',price:189000},
+    {id:'p188',section:'수냉(AIO 360)',model:'[발키리] GL360 ARGB (블랙)',price:189800},
+    {id:'p189',section:'수냉(AIO 360)',model:'[발키리] GL360 ARGB (화이트)',price:200400},
+    {id:'p190',section:'수냉(AIO 360)',model:'[Thermalright] Mjolnir Vision 360 ARGB (블랙)',price:209900},
+    {id:'p191',section:'수냉(AIO 360)',model:'[Thermalright] Mjolnir Vision 360 ARGB (화이트)',price:209900},
+    {id:'p192',section:'수냉(AIO 360)',model:'[쿨러마스터] MASTERLIQUID 360 ATMOS II Pixel LED (블랙)',price:223000},
+    {id:'p193',section:'수냉(AIO 360)',model:'[쿨러마스터] MASTERLIQUID 360 ATMOS II Pixel LED (화이트)',price:234000},
+    {id:'p194',section:'수냉(AIO 360)',model:'[NZXT] KRAKEN PLUS 360',price:242000},
+    {id:'p195',section:'수냉(AIO 360)',model:'[NZXT] KRAKEN PLUS 360 RGB (화이트)',price:253000},
+    {id:'p196',section:'수냉(AIO 360)',model:'[be quiet!] SILENT LOOP 3 360',price:257000},
+    {id:'p197',section:'수냉(AIO 360)',model:'[NZXT] KRAKEN 360 RGB (화이트)',price:272000},
+    {id:'p198',section:'수냉(AIO 360)',model:'[발키리] N360 AMOLED ARGB (블랙)',price:307800},
+    {id:'p199',section:'수냉(AIO 360)',model:'[발키리] N360 AMOLED ARGB (화이트)',price:307800},
+    {id:'p200',section:'수냉(AIO 360)',model:'[리안리] Hydroshift II LCD-S 360CL (블랙)',price:311400},
+    {id:'p201',section:'수냉(AIO 360)',model:'[리안리] Hydroshift II LCD-S 360CL (화이트)',price:311400},
+    {id:'p202',section:'수냉(AIO 360)',model:'[쿨러마스터] MASTERLIQUID 360 ION LCD',price:350800},
+    {id:'p203',section:'수냉(AIO 360)',model:'[ASUS] ProArt LC420 [140mm x3] 일부케이스에만 장착 가능',price:398000},
+    {id:'p204',section:'수냉(AIO 360)',model:'[Thermalright] WONDER VISION 360 UB ARGB (블랙)',price:399000},
+    {id:'p205',section:'수냉(AIO 360)',model:'[Thermalright] WONDER VISION 360 UB ARGB (화이트)',price:399000},
+    {id:'p206',section:'수냉(AIO 360)',model:'[리안리] Hydroshift II LCD-S 360TL (블랙)',price:422300},
+    {id:'p207',section:'수냉(AIO 360)',model:'[리안리] Hydroshift II LCD-S 360TL (화이트)',price:422300},
+    {id:'p208',section:'수냉(AIO 360)',model:'[ASUS] ROG Ryuo IV 360 ARGB',price:436800},
+    {id:'p209',section:'수냉(AIO 360)',model:'[TRYX] PANORAMA 3D SE 360 (블랙)',price:445000},
+    {id:'p210',section:'수냉(AIO 360)',model:'[TRYX] PANORAMA 3D SE 360 (화이트)',price:445000},
+    {id:'p211',section:'수냉(AIO 360)',model:'[Thermalright] Rainbow Vision 360 Turbo ARGB (블랙)',price:482800},
+    {id:'p212',section:'수냉(AIO 360)',model:'[Thermalright] Rainbow Vision 360 Turbo ARGB (화이트)',price:482800},
+    {id:'p213',section:'수냉(AIO 360)',model:'[TRYX] PANORAMA 3D ARGB 360 2025 (블랙)',price:590000},
+    {id:'p214',section:'수냉(AIO 360)',model:'[TRYX] PANORAMA 3D ARGB 360 2025 (화이트)',price:590000},
+    {id:'p215',section:'서버용 쿨러',model:'[ARCTIC] Freezer 4U-M [인텔 제온·AMD 스레드리퍼 전용]',price:89500},
+    {id:'p216',section:'서버용 쿨러',model:'[NOCTUA] NH-U14S DX-4677 [인텔 제온 전용]',price:218500},
+    {id:'p217',section:'서버용 쿨러',model:'[NOCTUA] NH-U14S TR5-SP6 [AMD 스레드리퍼 전용]',price:218500},
+    {id:'p218',section:'서버용 쿨러',model:'[에너맥스] LIQTECH XTR 360 ARGB [인텔 제온·AMD 스레드리퍼 전용]',price:259000},
+    {id:'p219',section:'서버용 쿨러',model:'[SilverStone] SST-XE360-4677 [인텔 제온 전용]',price:528700},
+    {id:'p220',section:'서버용 쿨러',model:'[SilverStone] SST-XE360-TR5 [AMD 스레드리퍼 전용]',price:602600},
   ]},
-  SSD:{label:'SSD',color:'#475569',bg:'#f1f5f9',items:[
-    {id:'s_excel_1',model:'NVMe SSD 1TB (PCIe 4.0x4)',price:284000},
-    {id:'s_excel_2',model:'NVMe SSD 1TB (OS/캐시)',price:149000},
-    {id:'s_excel_3',model:'NVMe SSD 1TB (서버 OS/캐시)',price:60000},
-    {id:'s_excel_4',model:'NVMe SSD 2TB (OS/캐시)',price:87000},
-    {id:'s1',model:'마이크론 Crucial P310 M.2 NVMe 1TB',price:284000},
-    {id:'s3',model:'SK하이닉스 Gold P31 M.2 NVMe 1TB',price:340000},
-    {id:'s4',model:'SK하이닉스 Platinum P41 M.2 NVMe 1TB',price:400000},
-    {id:'s5',model:'Seagate FireCuda 530R 1TB (M.2 PCIe Gen4)',price:572000},
+  MAINBOARD:{label:'메인보드',color:'#475569',bg:'#f1f5f9',items:[
+    {id:'p221',section:'인텔 셀러론·펜티엄 (LGA 1200) DDR4',model:'[ASRock] H510M-HDV/M.2 SE [HDMI, DVI, D-SUB]',price:99000},
+    {id:'p222',section:'인텔 셀러론·펜티엄 (LGA 1200) DDR4',model:'[ASUS] PRIME H510M-K [HDMI, D-SUB]',price:117400},
+    {id:'p223',section:'인텔 소켓 1700 (12/13/14세대) DDR4',model:'[COLORFUL] H610M-D V20A',price:75200},
+    {id:'p224',section:'인텔 소켓 1700 (12/13/14세대) DDR4',model:'[BIOSTAR] H610MS D4 [HDMI, DP]',price:77600},
+    {id:'p225',section:'인텔 소켓 1700 (12/13/14세대) DDR4',model:'[GIGABYTE] H610M K D4 [HDMI]',price:77900},
+    {id:'p226',section:'인텔 소켓 1700 (12/13/14세대) DDR4',model:'[ASRock] H610M-H2/M.2 D4 [HDMIx2]',price:83600},
+    {id:'p227',section:'인텔 소켓 1700 (12/13/14세대) DDR4',model:'[ASUS] PRIME H610M-CS D4 [HDMI, D-SUB]',price:85300},
+    {id:'p228',section:'인텔 소켓 1700 (12/13/14세대) DDR4',model:'[GIGABYTE] H610M H V2 D4 [HDMI, D-SUB]',price:89600},
+    {id:'p229',section:'인텔 소켓 1700 (12/13/14세대) DDR4',model:'[MSI] PRO H610M-E DDR4 [HDMI, D-SUB]',price:90200},
+    {id:'p230',section:'인텔 소켓 1700 (12/13/14세대) DDR4',model:'[COLORFUL] BATTLE-AX B760M-D PRO D4 V20',price:125500},
+    {id:'p231',section:'인텔 소켓 1700 (12/13/14세대) DDR4',model:'[MSI] PRO B760M-P D4',price:129700},
+    {id:'p232',section:'인텔 소켓 1700 (12/13/14세대) DDR4',model:'[ASUS] EX B760M-V5 D4',price:135500},
+    {id:'p233',section:'인텔 소켓 1700 (12/13/14세대) DDR4',model:'[GIGABYTE] B760M DS3H D4',price:138800},
+    {id:'p234',section:'인텔 소켓 1700 (12/13/14세대) DDR4',model:'[ASRock] B760M Pro-A/D4',price:145000},
+    {id:'p235',section:'인텔 소켓 1700 (12/13/14세대) DDR4',model:'[MSI] PRO B760M-A DDR4 II',price:145800},
+    {id:'p236',section:'인텔 소켓 1700 (12/13/14세대) DDR4',model:'[ASUS] PRIME B760M-A D4',price:151000},
+    {id:'p237',section:'인텔 소켓 1700 (12/13/14세대) DDR4',model:'[GIGABYTE] B760M DS3H WIFI6E D4 GEN5',price:170500},
+    {id:'p238',section:'인텔 소켓 1700 (12/13/14세대) DDR5 [보급형]',model:'[GIGABYTE] H610M K V2 [HDMI, DP]',price:92100},
+    {id:'p239',section:'인텔 소켓 1700 (12/13/14세대) DDR5 [보급형]',model:'[BIOSTAR] H610MHD D5 제이씨현 [HDMI, DVI]',price:96500},
+    {id:'p240',section:'인텔 소켓 1700 (12/13/14세대) DDR5 [보급형]',model:'[ASRock] H610M-HDV/M.2+ D5 [HDMI, DP, D-SUB]',price:100100},
+    {id:'p241',section:'인텔 소켓 1700 (12/13/14세대) DDR5 [보급형]',model:'[ASRock] H610M-H2/M.2 D5 [HDMIx2]',price:105300},
+    {id:'p242',section:'인텔 소켓 1700 (12/13/14세대) DDR5 [보급형]',model:'[MSI] PRO H610M-C EX D5 [HDMI, DP, DVI, D-SUB]',price:115000},
+    {id:'p243',section:'인텔 소켓 1700 (12/13/14세대) DDR5 [보급형]',model:'[ASUS] PRIME H610M-CS 2.5G [HDMI, D-SUB]',price:117000},
+    {id:'p244',section:'인텔 소켓 1700 (12/13/14세대) DDR5 [보급형]',model:'[GIGABYTE] H610M S2H V2 [HDMI, DP, D-SUB]',price:121000},
+    {id:'p245',section:'인텔 소켓 1700 (12/13/14세대) DDR5 [보급형]',model:'[ASUS] PRIME H610I-PLUS [M-ITX 타입]',price:209000},
+    {id:'p246',section:'인텔 소켓 1700 (12/13/14세대) DDR5 [고급형]',model:'[GIGABYTE] B760M D2HX LITE SI GEN5',price:127600},
+    {id:'p247',section:'인텔 소켓 1700 (12/13/14세대) DDR5 [고급형]',model:'[COLORFUL] BATTLE-AX B760M-K V20 D5 [HDMI, D-SUB]',price:133100},
+    {id:'p248',section:'인텔 소켓 1700 (12/13/14세대) DDR5 [고급형]',model:'[MSI] PRO B760M-P',price:136300},
+    {id:'p249',section:'인텔 소켓 1700 (12/13/14세대) DDR5 [고급형]',model:'[ASUS] PRIME B760M-KS D5',price:138000},
+    {id:'p250',section:'인텔 소켓 1700 (12/13/14세대) DDR5 [고급형]',model:'[GIGABYTE] B760M DS3H GEN5',price:141100},
+    {id:'p251',section:'인텔 소켓 1700 (12/13/14세대) DDR5 [고급형]',model:'[ASRock] B760M Pro-A',price:152600},
+    {id:'p252',section:'인텔 소켓 1700 (12/13/14세대) DDR5 [고급형]',model:'[ASUS] PRIME B760M-A Hit',price:155000},
+    {id:'p253',section:'인텔 소켓 1700 (12/13/14세대) DDR5 [고급형]',model:'[ASRock] B760M Pro RS D5',price:155700},
+    {id:'p254',section:'인텔 소켓 1700 (12/13/14세대) DDR5 [고급형]',model:'[MSI] PRO B760M-A WIFI',price:159600},
+    {id:'p255',section:'인텔 소켓 1700 (12/13/14세대) DDR5 [고급형]',model:'[ASUS] TUF Gaming B760M-PLUS II',price:170100},
+    {id:'p256',section:'인텔 소켓 1700 (12/13/14세대) DDR5 [고급형]',model:'[MSI] MAG B760M 박격포 II',price:180400},
+    {id:'p257',section:'인텔 소켓 1700 (12/13/14세대) DDR5 [고급형]',model:'[GIGABYTE] B760M AORUS ELITE GEN5',price:183700},
+    {id:'p258',section:'인텔 소켓 1700 (12/13/14세대) DDR5 [고급형]',model:'[ASUS] ROG STRIX B760-G GAMING WIFI',price:234000},
+    {id:'p259',section:'인텔 소켓 1700 (12/13/14세대) DDR5 [고급형]',model:'[MSI] MAG B760 토마호크 WIFI D5',price:236500},
+    {id:'p260',section:'인텔 소켓 1700 (12/13/14세대) DDR5 [고급형]',model:'[MSI] B760M 프로젝트 제로 [WIFI지원]',price:249000},
+    {id:'p261',section:'인텔 소켓 1700 (12/13/14세대) DDR5 [고급형]',model:'[GIGABYTE] B760M AORUS ELITE X AX',price:252000},
+    {id:'p262',section:'인텔 소켓 1700 (12/13/14세대) DDR5 [고급형]',model:'[ASUS] TUF Gaming B760M-PLUS WIFI',price:289000},
+    {id:'p263',section:'인텔 소켓 1700 (12/13/14세대) DDR5 [최고급형]',model:'[ASRock] Z790 Pro RS D5',price:306900},
+    {id:'p264',section:'인텔 소켓 1700 (12/13/14세대) DDR5 [최고급형]',model:'[GIGABYTE] Z790 UD (DDR5)',price:311300},
+    {id:'p265',section:'인텔 소켓 1700 (12/13/14세대) DDR5 [최고급형]',model:'[ASUS] PRIME Z790-P-CSM D5',price:351000},
+    {id:'p266',section:'인텔 소켓 1700 (12/13/14세대) DDR5 [최고급형]',model:'[ASUS] PRIME Z790-P WIFI-CSM',price:389000},
+    {id:'p267',section:'인텔 소켓 1851 (15세대) DDR5 [보급형]',model:'[MSI] PRO H810M-B [DP, HDMI]',price:117400},
+    {id:'p268',section:'인텔 소켓 1851 (15세대) DDR5 [보급형]',model:'[GIGABYTE] H810M K GEN5 [DP, HDMI]',price:118700},
+    {id:'p269',section:'인텔 소켓 1851 (15세대) DDR5 [보급형]',model:'[GIGABYTE] H810M H [HDMI, D-SUB]',price:119900},
+    {id:'p270',section:'인텔 소켓 1851 (15세대) DDR5 [보급형]',model:'[ASUS] PRIME H810M-A [HDMI, DP]',price:128800},
+    {id:'p271',section:'인텔 소켓 1851 (15세대) DDR5 [보급형]',model:'[ASUS] PRIME H810M-X 2.5G Gen5',price:134500},
+    {id:'p272',section:'인텔 소켓 1851 (15세대) DDR5 [보급형]',model:'[MSI] PRO H810M-C EX',price:136100},
+    {id:'p273',section:'인텔 소켓 1851 (15세대) DDR5 [보급형]',model:'[ASRock] H810M-X [HDMI, DP, D-SUB]',price:141500},
+    {id:'p274',section:'인텔 소켓 1851 (15세대) DDR5 [보급형]',model:'[ASUS] PRIME H810M-A WIFI',price:150100},
+    {id:'p275',section:'인텔 소켓 1851 (15세대) DDR5 [보급형]',model:'[ASUS] H810M AYW GAMING WIFI',price:159000},
+    {id:'p276',section:'인텔 소켓 1851 (15세대) DDR5 [보급형]',model:'[ASRock] H810M-X WIFI [HDMI, DP, D-SUB]',price:162400},
+    {id:'p277',section:'인텔 소켓 1851 (15세대) DDR5 [고급형]',model:'[ASUS] PRIME B860M-KS',price:162000},
+    {id:'p278',section:'인텔 소켓 1851 (15세대) DDR5 [고급형]',model:'[GIGABYTE] B860M DS3H',price:179200},
+    {id:'p279',section:'인텔 소켓 1851 (15세대) DDR5 [고급형]',model:'[ASRock] B860M Pro-A',price:185000},
+    {id:'p280',section:'인텔 소켓 1851 (15세대) DDR5 [고급형]',model:'[ASUS] PRIME B860M-A-CSM',price:189000},
+    {id:'p281',section:'인텔 소켓 1851 (15세대) DDR5 [고급형]',model:'[ASUS] PRIME B860M-K-CSM',price:190400},
+    {id:'p282',section:'인텔 소켓 1851 (15세대) DDR5 [고급형]',model:'[ASRock] B860M Rock WiFi',price:199000},
+    {id:'p283',section:'인텔 소켓 1851 (15세대) DDR5 [고급형]',model:'[MSI] PRO B860M-A WIFI',price:210400},
+    {id:'p284',section:'인텔 소켓 1851 (15세대) DDR5 [고급형]',model:'[GIGABYTE] B860M AORUS ELITE',price:239800},
+    {id:'p285',section:'인텔 소켓 1851 (15세대) DDR5 [고급형]',model:'[ASRock] B860M Pro RS',price:249800},
+    {id:'p286',section:'인텔 소켓 1851 (15세대) DDR5 [고급형]',model:'[ASUS] TUF Gaming B860M-PLUS',price:252000},
+    {id:'p287',section:'인텔 소켓 1851 (15세대) DDR5 [고급형]',model:'[ASRock] B860M LiveMixer WiFi',price:253000},
+    {id:'p288',section:'인텔 소켓 1851 (15세대) DDR5 [고급형]',model:'[ASRock] B860M 스틸레전드 WiFi',price:268400},
+    {id:'p289',section:'인텔 소켓 1851 (15세대) DDR5 [고급형]',model:'[ASRock] B860M Pro RS WiFi',price:269900},
+    {id:'p290',section:'인텔 소켓 1851 (15세대) DDR5 [고급형]',model:'[MSI] MAG B860M 박격포 WIFI',price:270400},
+    {id:'p291',section:'인텔 소켓 1851 (15세대) DDR5 [고급형]',model:'[GIGABYTE] B860M AORUS ELITE WIFI6E ICE',price:281000},
+    {id:'p292',section:'인텔 소켓 1851 (15세대) DDR5 [고급형]',model:'[GIGABYTE] B860M AORUS ELITE WIFI6E',price:281000},
+    {id:'p293',section:'인텔 소켓 1851 (15세대) DDR5 [고급형]',model:'[MSI] MAG B860 토마호크 WIFI',price:291600},
+    {id:'p294',section:'인텔 소켓 1851 (15세대) DDR5 [고급형]',model:'[ASUS] ROG STRIX B860-G GAMING WIFI',price:294000},
+    {id:'p295',section:'인텔 소켓 1851 (15세대) DDR5 [고급형]',model:'[ASRock] B860 Pro RS WiFi',price:300200},
+    {id:'p296',section:'인텔 소켓 1851 (15세대) DDR5 [고급형]',model:'[GIGABYTE] B860 AORUS ELITE WIFI7 ICE',price:305000},
+    {id:'p297',section:'인텔 소켓 1851 (15세대) DDR5 [고급형]',model:'[ASUS] ROG STRIX B860-I GAMING WIFI [M-ITX 타입]',price:419000},
+    {id:'p298',section:'인텔 소켓 1851 (15세대) DDR5 [최고급형]',model:'[GIGABYTE] Z890 UD',price:331600},
+    {id:'p299',section:'인텔 소켓 1851 (15세대) DDR5 [최고급형]',model:'[ASRock] Z890 Pro-A',price:343000},
+    {id:'p300',section:'인텔 소켓 1851 (15세대) DDR5 [최고급형]',model:'[MSI] PRO Z890-P WIFI',price:352100},
+    {id:'p301',section:'인텔 소켓 1851 (15세대) DDR5 [최고급형]',model:'[ASRock] Z890 Pro-A WiFi',price:362000},
+    {id:'p302',section:'인텔 소켓 1851 (15세대) DDR5 [최고급형]',model:'[GIGABYTE] Z890 AORUS ELITE WIFI7',price:367000},
+    {id:'p303',section:'인텔 소켓 1851 (15세대) DDR5 [최고급형]',model:'[ASRock] Z890 Pro RS',price:367500},
+    {id:'p304',section:'인텔 소켓 1851 (15세대) DDR5 [최고급형]',model:'[ASUS] PRIME Z890M-PLUS WIFI-CSM',price:379000},
+    {id:'p305',section:'인텔 소켓 1851 (15세대) DDR5 [최고급형]',model:'[GIGABYTE] Z890 AORUS ELITE WIFI7 ICE',price:381000},
+    {id:'p306',section:'인텔 소켓 1851 (15세대) DDR5 [최고급형]',model:'[ASUS] Z890 AYW GAMING WIFI W',price:384000},
+    {id:'p307',section:'인텔 소켓 1851 (15세대) DDR5 [최고급형]',model:'[ASUS] PRIME Z890-P WIFI-CSM',price:384000},
+    {id:'p308',section:'인텔 소켓 1851 (15세대) DDR5 [최고급형]',model:'[MSI] PRO Z890-A WIFI',price:392100},
+    {id:'p309',section:'인텔 소켓 1851 (15세대) DDR5 [최고급형]',model:'[ASUS] TUF Gaming Z890-PLUS WIFI',price:399000},
+    {id:'p310',section:'인텔 소켓 1851 (15세대) DDR5 [최고급형]',model:'[ASRock] Z890 Pro RS WiFi White',price:407400},
+    {id:'p311',section:'인텔 소켓 1851 (15세대) DDR5 [최고급형]',model:'[ASUS] TUF Gaming Z890-PRO WIFI',price:446600},
+    {id:'p312',section:'인텔 소켓 1851 (15세대) DDR5 [최고급형]',model:'[GIGABYTE] Z890 AORUS PRO ICE',price:451500},
+    {id:'p313',section:'인텔 소켓 1851 (15세대) DDR5 [최고급형]',model:'[MSI] MAG Z890 토마호크 WIFI',price:463300},
+    {id:'p314',section:'인텔 소켓 1851 (15세대) DDR5 [최고급형]',model:'[ASRock] Z890 스틸레전드 WIFI',price:469000},
+    {id:'p315',section:'인텔 소켓 1851 (15세대) DDR5 [최고급형]',model:'[ASRock] Z890 Nova WiFi',price:530600},
+    {id:'p316',section:'인텔 소켓 1851 (15세대) DDR5 [최고급형]',model:'[MSI] MPG Z890 엣지 TI WIFI',price:554100},
+    {id:'p317',section:'인텔 소켓 1851 (15세대) DDR5 [최고급형]',model:'[MSI] MPG Z890 카본 WIFI',price:602800},
+    {id:'p318',section:'인텔 소켓 1851 (15세대) DDR5 [최고급형]',model:'[GIGABYTE] Z890 AORUS MASTER',price:678700},
+    {id:'p319',section:'인텔 소켓 1851 (15세대) DDR5 [최고급형]',model:'[MSI] MEG Z890 유니파이-X',price:705200},
+    {id:'p320',section:'인텔 소켓 1851 (15세대) DDR5 [최고급형]',model:'[ASRock] Z890 Taichi',price:788100},
+    {id:'p321',section:'인텔 소켓 1851 (15세대) DDR5 [최고급형]',model:'[ASUS] PRO WS W880-ACE SE',price:789000},
+    {id:'p322',section:'인텔 소켓 1851 (15세대) DDR5 [최고급형]',model:'[ASUS] ProArt Z890-CREATOR WIFI',price:829000},
+    {id:'p323',section:'인텔 소켓 1851 (15세대) DDR5 [최고급형]',model:'[ASUS] ROG MAXIMUS Z890 APEX',price:899000},
+    {id:'p324',section:'인텔 소켓 1851 (15세대) DDR5 [최고급형]',model:'[MSI] MEG Z890 에이스',price:953000},
+    {id:'p325',section:'인텔 소켓 1851 (15세대) DDR5 [최고급형]',model:'[ASUS] ROG MAXIMUS Z890 HERO',price:999000},
+    {id:'p326',section:'인텔 소켓 1851 (15세대) DDR5 [최고급형]',model:'[ASUS] ROG MAXIMUS Z890 EXTREME',price:1539000},
+    {id:'p327',section:'인텔 소켓 4677 제온 (사파이어 래피드) DDR5',model:'[ASUS] PRO WS W790-ACE',price:1401700},
+    {id:'p328',section:'인텔 소켓 4677 제온 (사파이어 래피드) DDR5',model:'[ASRock] W790 WS',price:1467200},
+    {id:'p329',section:'인텔 소켓 4677 제온 (사파이어 래피드) DDR5',model:'[GIGABYTE] W790 AI TOP',price:1496000},
+    {id:'p330',section:'인텔 소켓 4677 제온 (사파이어 래피드) DDR5',model:'[ASUS] PRO WS W790E-SAGE SE',price:2117500},
   ]},
-  HDD:{label:'HDD',color:'#475569',bg:'#f1f5f9',items:[
-    {id:'h_excel_1',model:'HDD 1TB (MinIO Erasure Coding)',price:174000},
-    {id:'h_excel_2',model:'HDD 2TB (MinIO Erasure Coding)',price:150000},
-    {id:'h1',model:'WD BLUE 2TB 3.5" SATA 7200/256M',price:176000},
-    {id:'h2',model:'WD BLUE 2TB 3.5" SATA',price:165000},
-    {id:'h5',model:'WD UltraStar 2TB SATA 7200rpm (서버용)',price:257000},
-    {id:'h6',model:'WD UltraStar 4TB SATA 7200rpm (서버/WS용)',price:373000},
+  MEMORY:{label:'메모리(램)',color:'#475569',bg:'#f1f5f9',items:[
+    {id:'p331',section:'DDR4 8GB~16GB RAM [인텔 로켓(11세대), 코멧(10세대) 지원보드, AMD 3, 4세대]',model:'[AFOX] 8GB (8GBx1) DDR4-3200 CL22',price:85600},
+    {id:'p332',section:'DDR4 8GB~16GB RAM [인텔 로켓(11세대), 코멧(10세대) 지원보드, AMD 3, 4세대]',model:'[GeIL] 8GB (8GBx1) DDR4-3200 CL22 PRISTINE',price:87400},
+    {id:'p333',section:'DDR4 8GB~16GB RAM [인텔 로켓(11세대), 코멧(10세대) 지원보드, AMD 3, 4세대]',model:'[Terabyte] 8GB (8GBx1) Ramonster DDR4-3200 CL22',price:89700},
+    {id:'p334',section:'DDR4 8GB~16GB RAM [인텔 로켓(11세대), 코멧(10세대) 지원보드, AMD 3, 4세대]',model:'[킹스톤] 8GB (8GBx1) FURY Beast DDR4-2666 CL16 방열판',price:117400},
+    {id:'p335',section:'DDR4 8GB~16GB RAM [인텔 로켓(11세대), 코멧(10세대) 지원보드, AMD 3, 4세대]',model:'[삼성전자] 8GB (8GBx1) DDR4-3200',price:132800},
+    {id:'p336',section:'DDR4 8GB~16GB RAM [인텔 로켓(11세대), 코멧(10세대) 지원보드, AMD 3, 4세대]',model:'[AFOX] 16GB (16GBx1) DDR4-3200 CL22',price:156100},
+    {id:'p337',section:'DDR4 8GB~16GB RAM [인텔 로켓(11세대), 코멧(10세대) 지원보드, AMD 3, 4세대]',model:'[Terabyte] 16GB (16GBx1) Ramonster DDR4-2666 CL19',price:156700},
+    {id:'p338',section:'DDR4 8GB~16GB RAM [인텔 로켓(11세대), 코멧(10세대) 지원보드, AMD 3, 4세대]',model:'[GeIL] 16GB (16GBx1) DDR4-3200 CL22 PRISTINE',price:161200},
+    {id:'p339',section:'DDR4 8GB~16GB RAM [인텔 로켓(11세대), 코멧(10세대) 지원보드, AMD 3, 4세대]',model:'[AFOX] 16GB (8GBx2) DDR4-3200 CL22',price:171200},
+    {id:'p340',section:'DDR4 8GB~16GB RAM [인텔 로켓(11세대), 코멧(10세대) 지원보드, AMD 3, 4세대]',model:'[GeIL] 16GB (8GBx2) DDR4-3200 CL22 PRISTINE',price:174800},
+    {id:'p341',section:'DDR4 8GB~16GB RAM [인텔 로켓(11세대), 코멧(10세대) 지원보드, AMD 3, 4세대]',model:'[Terabyte] 16GB (8GBx2) Ramonster DDR4-3200 CL22',price:179400},
+    {id:'p342',section:'DDR4 8GB~16GB RAM [인텔 로켓(11세대), 코멧(10세대) 지원보드, AMD 3, 4세대]',model:'[마이크론] 16GB (16GBx1) Crucial DDR4-3200 CL22',price:210900},
+    {id:'p343',section:'DDR4 8GB~16GB RAM [인텔 로켓(11세대), 코멧(10세대) 지원보드, AMD 3, 4세대]',model:'[마이크론] 16GB (16GBx1) Crucial DDR4-3200 CL22 PRO 방열판',price:212400},
+    {id:'p344',section:'DDR4 8GB~16GB RAM [인텔 로켓(11세대), 코멧(10세대) 지원보드, AMD 3, 4세대]',model:'[CORSAIR] 16GB (16GBx1) VENGEANCE RGB PRO DDR4-3200 CL16 RGB 방열판',price:224200},
+    {id:'p345',section:'DDR4 8GB~16GB RAM [인텔 로켓(11세대), 코멧(10세대) 지원보드, AMD 3, 4세대]',model:'[SK 하이닉스] 16GB (16GBx1) DDR4-3200',price:238700},
+    {id:'p346',section:'DDR4 8GB~16GB RAM [인텔 로켓(11세대), 코멧(10세대) 지원보드, AMD 3, 4세대]',model:'[삼성전자] 16GB (8GBx2) DDR4-3200',price:265600},
+    {id:'p347',section:'DDR4 8GB~16GB RAM [인텔 로켓(11세대), 코멧(10세대) 지원보드, AMD 3, 4세대]',model:'[삼성전자] 16GB (16GBx1) DDR4-3200',price:266400},
+    {id:'p348',section:'DDR4 32GB 이상 RAM',model:'[AFOX] 32GB (16GBx2) DDR4-3200 CL22',price:312200},
+    {id:'p349',section:'DDR4 32GB 이상 RAM',model:'[Terabyte] 32GB (16GBx2) Ramonster DDR4-2666 CL19',price:313400},
+    {id:'p350',section:'DDR4 32GB 이상 RAM',model:'[GeIL] 32GB (16GBx2) DDR4-3200 CL22 PRISTINE',price:322400},
+    {id:'p351',section:'DDR4 32GB 이상 RAM',model:'[마이크론] 32GB (16GBx2) Crucial DDR4-3200 CL22',price:421800},
+    {id:'p352',section:'DDR4 32GB 이상 RAM',model:'[마이크론] 32GB (16GBx2) Crucial DDR4-3200 CL22 PRO 방열판',price:424800},
+    {id:'p353',section:'DDR4 32GB 이상 RAM',model:'[CORSAIR] 32GB (16GBx2) DOMINATOR PLATINUM RGB DDR4-3200 CL16 RGB 방열판',price:437600},
+    {id:'p354',section:'DDR4 32GB 이상 RAM',model:'[SK 하이닉스] 32GB (16GBx2) DDR4-3200',price:477400},
+    {id:'p355',section:'DDR4 32GB 이상 RAM',model:'[삼성전자] 32GB (16GBx2) DDR4-3200',price:532800},
+    {id:'p356',section:'DDR4 32GB 이상 RAM',model:'[삼성전자] 32GB (32GBx1) DDR4-3200',price:599500},
+    {id:'p357',section:'DDR4 32GB 이상 RAM',model:'[삼성전자] 64GB (16GBx4) DDR4-3200',price:1065600},
+    {id:'p358',section:'DDR4 32GB 이상 RAM',model:'[삼성전자] 64GB (32GBx2) DDR4-3200',price:1199000},
+    {id:'p359',section:'DDR4 32GB 이상 RAM',model:'[삼성전자] 128GB (32GBx4) DDR4-3200',price:2398000},
+    {id:'p360',section:'DDR4 32GB 이상 RAM',model:'[삼성전자] 256GB (32GBx8) DDR4-3200',price:4796000},
+    {id:'p361',section:'DDR5 8GB~16GB RAM',model:'[타무즈] 8GB (8Gx1) DDR5-5600 CL46',price:141600},
+    {id:'p362',section:'DDR5 8GB~16GB RAM',model:'[KingBank] 8GB (8GBx1) DDR5-5600 CL46 화이트 방열판',price:146700},
+    {id:'p363',section:'DDR5 8GB~16GB RAM',model:'[마이크론] 8GB (8Gx1) Crucial DDR5-5600 CL46',price:193860},
+    {id:'p364',section:'DDR5 8GB~16GB RAM',model:'[삼성전자] 8GB (8Gx1) DDR5-5600',price:223560},
+    {id:'p365',section:'DDR5 8GB~16GB RAM',model:'[타무즈] 16GB (16Gx1) DDR5-5600 CL40',price:274700},
+    {id:'p366',section:'DDR5 8GB~16GB RAM',model:'[Terabyte] 16GB (16GBx1) Ramonster DDR5-4800',price:276400},
+    {id:'p367',section:'DDR5 8GB~16GB RAM',model:'[타무즈] 16GB (8Gx2) DDR5-5600 CL46',price:283200},
+    {id:'p368',section:'DDR5 8GB~16GB RAM',model:'[킹스톤] 16GB (16Gx1) FURY DDR5-5600 CL36 Beast 방열판',price:298000},
+    {id:'p369',section:'DDR5 8GB~16GB RAM',model:'[AGI] 16GB (16Gx1) DDR5-5600 CL46 UD238',price:312700},
+    {id:'p370',section:'DDR5 8GB~16GB RAM',model:'[마이크론] 16GB (16Gx1) Crucial DDR5-5600 CL46',price:316400},
+    {id:'p371',section:'DDR5 8GB~16GB RAM',model:'[Apacer] 16GB (16GBx1) DDR5-5600 CL46',price:322920},
+    {id:'p372',section:'DDR5 8GB~16GB RAM',model:'[삼성전자] 16GB (16Gx1) DDR5-5600',price:327540},
+    {id:'p373',section:'DDR5 8GB~16GB RAM',model:'[ESSENCORE] 16GB (16Gx1) KLEVV DDR5-5600 CL46',price:334900},
+    {id:'p374',section:'DDR5 8GB~16GB RAM',model:'[ANACOMDA] 16GB (16GBx1) DDR5-6000 CL38 Kingsnake 화이트',price:347600},
+    {id:'p375',section:'DDR5 8GB~16GB RAM',model:'[CORSAIR] 16GB (16Gx1) DDR5-6000 CL36 VENGEANCE 방열판',price:354000},
+    {id:'p376',section:'DDR5 8GB~16GB RAM',model:'[G.SKILL] 16GB (16Gx1) DDR5-6000 CL36 AEGIS 5',price:359600},
+    {id:'p377',section:'DDR5 8GB~16GB RAM',model:'[SK 하이닉스] 16GB (16Gx1) DDR5-5600',price:363000},
+    {id:'p378',section:'DDR5 8GB~16GB RAM',model:'[ADATA] 16GB (16Gx1) DDR5-5600 CL46',price:365800},
+    {id:'p379',section:'DDR5 8GB~16GB RAM',model:'[마이크론] 16GB (8Gx2) Crucial DDR5-5600 CL46',price:387720},
+    {id:'p380',section:'DDR5 8GB~16GB RAM',model:'[마이크론] 16GB (16Gx1) DDR5-6000 CL36 PRO Overclocking 화이트',price:410400},
+    {id:'p381',section:'DDR5 8GB~16GB RAM',model:'[마이크론] 16G (16Gx1) DDR5-6400 CL38 PRO Overclocking',price:418000},
+    {id:'p382',section:'DDR5 8GB~16GB RAM',model:'[삼성전자] 16GB (8Gx2) DDR5-5600',price:447120},
+    {id:'p383',section:'DDR5 32GB~48GB RAM',model:'[Terabyte] 32GB (16GBx2) Ramonster DDR5-4800',price:552800},
+    {id:'p384',section:'DDR5 32GB~48GB RAM',model:'[킹스톤] 32GB (32Gx1) FURY DDR5-5600 CL36 Beast 방열판',price:587400},
+    {id:'p385',section:'DDR5 32GB~48GB RAM',model:'[킹스톤] 32GB (16Gx2) FURY DDR5-5600 CL36 Beast 방열판',price:596000},
+    {id:'p386',section:'DDR5 32GB~48GB RAM',model:'[마이크론] 32GB (32Gx1) Crucial DDR5-5600 CL46',price:604600},
+    {id:'p387',section:'DDR5 32GB~48GB RAM',model:'[ESSENCORE] 32GB (32GBx1) KLEVV DDR5-5600 CL46',price:614800},
+    {id:'p388',section:'DDR5 32GB~48GB RAM',model:'[마이크론] 32GB (32Gx1) Crucial DDR5-5600 CL46 PRO 방열판',price:621500},
+    {id:'p389',section:'DDR5 32GB~48GB RAM',model:'[킹스펙] 32GB (32GBx1) DDR5-5600 CL46',price:622200},
+    {id:'p390',section:'DDR5 32GB~48GB RAM',model:'[AGI] 32GB (16Gx2) DDR5-5600 CL46 UD238',price:625400},
+    {id:'p391',section:'DDR5 32GB~48GB RAM',model:'[마이크론] 32GB (16Gx2) Crucial DDR5-5600 CL46',price:632800},
+    {id:'p392',section:'DDR5 32GB~48GB RAM',model:'[Apacer] 32GB (16GBx2) DDR5-5600 CL46',price:645840},
+    {id:'p393',section:'DDR5 32GB~48GB RAM',model:'[삼성전자] 32GB (16Gx2) DDR5-5600',price:655080},
+    {id:'p394',section:'DDR5 32GB~48GB RAM',model:'[ADATA] 32GB (32Gx1) DDR5-5600 CL46',price:669400},
+    {id:'p395',section:'DDR5 32GB~48GB RAM',model:'[ESSENCORE] 32GB (16GBx2) KLEVV DDR5-5600 CL46',price:669800},
+    {id:'p396',section:'DDR5 32GB~48GB RAM',model:'[TeamGroup] 32GB (32Gx1) DDR5-5600 CL46 Elite',price:688100},
+    {id:'p397',section:'DDR5 32GB~48GB RAM',model:'[ANACOMDA] 32GB (16GBx2) DDR5-6000 CL38 Kingsnake 화이트',price:695200},
+    {id:'p398',section:'DDR5 32GB~48GB RAM',model:'[CORSAIR] 32GB (16Gx2) DDR5-6000 CL36 VENGEANCE 방열판',price:708000},
+    {id:'p399',section:'DDR5 32GB~48GB RAM',model:'[CORSAIR] 32GB (16Gx2) DDR5-6000 CL36 VENGEANCE WHITE 방열판',price:708000},
+    {id:'p400',section:'DDR5 32GB~48GB RAM',model:'[G.SKILL] 32GB (16Gx2) DDR5-6000 CL36 AEGIS 5',price:719200},
+    {id:'p401',section:'DDR5 32GB~48GB RAM',model:'[ESSENCORE] 32GB (16Gx2) KLEVV DDR5-5600 CL46 7200MHz Overclocking',price:721300},
+    {id:'p402',section:'DDR5 32GB~48GB RAM',model:'[삼성전자] 32GB (32Gx1) DDR5-5600',price:725500},
+    {id:'p403',section:'DDR5 32GB~48GB RAM',model:'[SK 하이닉스] 32GB (16Gx2) DDR5-5600',price:726000},
+    {id:'p404',section:'DDR5 32GB~48GB RAM',model:'[ADATA] 32GB (16Gx2) DDR5-5600 CL46',price:731600},
+    {id:'p405',section:'DDR5 32GB~48GB RAM',model:'[ADATA] 32GB (16Gx2) DDR5-6000 CL30 LANCER BLADE 화이트',price:734000},
+    {id:'p406',section:'DDR5 32GB~48GB RAM',model:'[AGI] 32GB (16Gx2) DDR5-7600 CL36 TURBOJET UD858 RGB DUAL 패키지',price:736000},
+    {id:'p407',section:'DDR5 32GB~48GB RAM',model:'[AGI] 32GB (16Gx2) DDR5-6000 CL30 TURBOJET UD858 RGB 화이트 패키지',price:751500},
+    {id:'p408',section:'DDR5 32GB~48GB RAM',model:'[AGI] 32GB (16Gx2) DDR5-6000 CL30 TURBOJET UD858 RGB 블랙 패키지',price:751500},
+    {id:'p409',section:'DDR5 32GB~48GB RAM',model:'[AGI] 32GB (16Gx2) DDR5-6000 CL36 TURBOJET UD858 RGB 블랙 패키지',price:751500},
+    {id:'p410',section:'DDR5 32GB~48GB RAM',model:'[AGI] 32GB (16Gx2) DDR5-6000 CL36 TURBOJET UD858 RGB 화이트 패키지',price:751500},
+    {id:'p411',section:'DDR5 32GB~48GB RAM',model:'[TeamGroup] 32GB (16Gx2) T-Force DDR5-6000 CL38 Delta RGB 블랙',price:762400},
+    {id:'p412',section:'DDR5 32GB~48GB RAM',model:'[ADATA] 32GB (16Gx2) DDR5-6000 CL30 ARMAX RGB',price:762400},
+    {id:'p413',section:'DDR5 32GB~48GB RAM',model:'[TeamGroup] 32GB (16Gx2) T-CREATE DDR5-6000 CL30 EXPERT',price:762800},
+    {id:'p414',section:'DDR5 32GB~48GB RAM',model:'[TeamGroup] 32GB (16Gx2) T-CREATE DDR5-6000 CL30 EXPERT 화이트',price:762800},
+    {id:'p415',section:'DDR5 32GB~48GB RAM',model:'[ADATA] 32GB (16Gx2) DDR5-6000 CL30 LANCER BLADE RGB 블랙',price:769900},
+    {id:'p416',section:'DDR5 32GB~48GB RAM',model:'[ADATA] 32GB (16Gx2) DDR5-6000 CL30 LANCER BLADE RGB 화이트',price:769900},
+    {id:'p417',section:'DDR5 32GB~48GB RAM',model:'[ESSENCORE] 32GB (16Gx2) KLEVV DDR5-6000 CL30 BOLT V',price:771600},
+    {id:'p418',section:'DDR5 32GB~48GB RAM',model:'[ESSENCORE] 32GB (16Gx2) KLEVV DDR5-6000 CL30 BOLT V 화이트',price:771600},
+    {id:'p419',section:'DDR5 32GB~48GB RAM',model:'[ADATA] 32GB (16Gx2) DDR5-6000 CL30 LANCER RGB 화이트',price:779000},
+    {id:'p420',section:'DDR5 32GB~48GB RAM',model:'[ADATA] 32GB (16Gx2) DDR5-6000 CL30 LANCER RGB 블랙',price:779000},
+    {id:'p421',section:'DDR5 32GB~48GB RAM',model:'[ESSENCORE] 32GB (16GBx2) KLEVV DDR5-6000 CL30 CRAS V RGB 블랙',price:802800},
+    {id:'p422',section:'DDR5 32GB~48GB RAM',model:'[ESSENCORE] 32GB (16GBx2) KLEVV DDR5-6000 CL30 CRAS V RGB 화이트',price:802800},
+    {id:'p423',section:'DDR5 32GB~48GB RAM',model:'[SK 하이닉스] 32GB (32GBx1) DDR5-5600',price:803000},
+    {id:'p424',section:'DDR5 32GB~48GB RAM',model:'[G.SKILL] 32GB (16Gx2) DDR5-6000 CL30 RIPJAWS S5 J 블랙',price:813200},
+    {id:'p425',section:'DDR5 32GB~48GB RAM',model:'[G.SKILL] 32GB (16Gx2) DDR5-6000 CL30 RIPJAWS S5 J 화이트',price:813200},
+    {id:'p426',section:'DDR5 32GB~48GB RAM',model:'[마이크론] 32GB (16Gx2) DDR5-6000 CL36 PRO Overclocking 화이트',price:828800},
+    {id:'p427',section:'DDR5 32GB~48GB RAM',model:'[마이크론] 32GB (16Gx2) DDR5-6400 CL38 PRO Overclocking',price:866400},
+    {id:'p428',section:'DDR5 32GB~48GB RAM',model:'[G.SKILL] 32GB (16Gx2) DDR5-6000 CL30 TRIDENT Z5 RGB',price:884800},
+    {id:'p429',section:'DDR5 32GB~48GB RAM',model:'[마이크론] 32GB (16Gx2) DDR5-6400 CL38 PRO Overclocking 화이트',price:889200},
+    {id:'p430',section:'DDR5 32GB~48GB RAM',model:'[G.SKILL] 32GB (16Gx2) DDR5-6000 CL30 TRIDENT Z5 NEO RGB 블랙',price:916200},
+    {id:'p431',section:'DDR5 32GB~48GB RAM',model:'[G.SKILL] 32GB (16Gx2) DDR5-6000 CL30 TRIDENT Z5 NEO RGB J 화이트',price:916200},
+    {id:'p432',section:'DDR5 32GB~48GB RAM',model:'[G.SKILL] 32GB (16Gx2) DDR5-6000 CL28 RIPJAWS M5 NEO RGB 블랙 패키지',price:946400},
+    {id:'p433',section:'DDR5 32GB~48GB RAM',model:'[G.SKILL] 32GB (16Gx2) DDR5-6000 CL28 RIPJAWS M5 NEO RGB 화이트 패키지',price:946400},
+    {id:'p434',section:'DDR5 32GB~48GB RAM',model:'[ESSENCORE] 48GB (24Gx2) KLEVV DDR5-6000 CL30 CRAS V RGB 블랙',price:1109800},
+    {id:'p435',section:'DDR5 32GB~48GB RAM',model:'[ESSENCORE] 48GB (24Gx2) KLEVV DDR5-6000 CL30 CRAS V RGB 화이트',price:1109800},
+    {id:'p436',section:'DDR5 32GB~48GB RAM',model:'[ESSENCORE] 48GB (24Gx2) KLEVV DDR5-6000 CL30 CRAS V RGB 화이트 7200MHz Overclocking',price:1129800},
+    {id:'p437',section:'DDR5 32GB~48GB RAM',model:'[AGI] 48GB (24Gx2) DDR5-6000 CL30 TURBOJET UD858 RGB 블랙 패키지',price:1184700},
+    {id:'p438',section:'DDR5 64GB RAM',model:'[킹스톤] 64GB (32Gx2) FURY DDR5-5600 CL36 Beast 방열판',price:1174800},
+    {id:'p439',section:'DDR5 64GB RAM',model:'[마이크론] 64GB (32Gx2) Crucial DDR5-5600 CL46',price:1209200},
+    {id:'p440',section:'DDR5 64GB RAM',model:'[ESSENCORE] 64GB (32GBx2) KLEVV DDR5-5600 CL46',price:1229600},
+    {id:'p441',section:'DDR5 64GB RAM',model:'[마이크론] 64GB (32Gx2) Crucial DDR5-5600 CL46 PRO 방열판',price:1243000},
+    {id:'p442',section:'DDR5 64GB RAM',model:'[삼성전자] 64GB (16Gx4) DDR5-5600',price:1310160},
+    {id:'p443',section:'DDR5 64GB RAM',model:'[ADATA] 64GB (32Gx2) DDR5-5600 CL46',price:1338800},
+    {id:'p444',section:'DDR5 64GB RAM',model:'[TeamGroup] 64GB (32Gx2) DDR5-5600 CL46 Elite',price:1376200},
+    {id:'p445',section:'DDR5 64GB RAM',model:'[TeamGroup] 64GB (32Gx2) T-Force DDR5-6000 CL38 Delta RGB 블랙',price:1411600},
+    {id:'p446',section:'DDR5 64GB RAM',model:'[삼성전자] 64GB (32Gx2) DDR5-5600',price:1451000},
+    {id:'p447',section:'DDR5 64GB RAM',model:'[ESSENCORE] 64GB (32GBx2) KLEVV DDR5-5600 CL46 7200MHz Overclocking',price:1456800},
+    {id:'p448',section:'DDR5 64GB RAM',model:'[G.SKILL] 64GB (32Gx2) DDR5-6000 CL30 RIPJAWS S5 J 블랙',price:1499900},
+    {id:'p449',section:'DDR5 64GB RAM',model:'[G.SKILL] 64GB (32Gx2) DDR5-6000 CL30 RIPJAWS S5 J 화이트',price:1499900},
+    {id:'p450',section:'DDR5 64GB RAM',model:'[ESSENCORE] 64GB (32Gx2) KLEVV DDR5-6000 CL30 CRAS V RGB 블랙',price:1568600},
+    {id:'p451',section:'DDR5 64GB RAM',model:'[ESSENCORE] 64GB (32Gx2) KLEVV DDR5-6000 CL30 CRAS V RGB 화이트',price:1568600},
+    {id:'p452',section:'DDR5 64GB RAM',model:'[SK 하이닉스] 64GB (32Gx2) DDR5-5600',price:1606000},
+    {id:'p453',section:'DDR5 64GB RAM',model:'[ADATA] 64GB (32Gx2) DDR5-6000 CL30 ARMAX RGB',price:1617000},
+    {id:'p454',section:'DDR5 64GB RAM',model:'[G.SKILL] 64GB (32GBx2) DDR5-6000 CL32 TRIDENT Z5 NEO RGB J',price:1638500},
+    {id:'p455',section:'DDR5 64GB RAM',model:'[G.SKILL] 64GB (32Gx2) DDR5-6000 CL30 TRIDENT Z5 RGB 화이트',price:1639000},
+    {id:'p456',section:'DDR5 64GB RAM',model:'[G.SKILL] 64GB (32Gx2) DDR5-6000 CL30 TRIDENT Z5 RGB 블랙',price:1639000},
+    {id:'p457',section:'DDR5 64GB 이상 게이밍 RAM',model:'[G.SKILL] 64GB (32Gx2) DDR5-6400 CL32 RIPJAWS M5 RGB 화이트',price:1790800},
+    {id:'p458',section:'DDR5 64GB 이상 게이밍 RAM',model:'[G.SKILL] 64GB (32Gx2) DDR5-6400 CL32 RIPJAWS M5 RGB 블랙',price:1790800},
+    {id:'p459',section:'DDR5 128GB RAM',model:'[마이크론] 128GB (32GBx4) Crucial DDR5-5600 CL46',price:2418400},
+    {id:'p460',section:'DDR5 128GB RAM',model:'[ESSENCORE] 128GB (32GBx4) KLEVV DDR5-5600 CL46',price:2459200},
+    {id:'p461',section:'DDR5 128GB RAM',model:'[삼성전자] 128GB (32GBx4) DDR5-5600',price:2902000},
+    {id:'p462',section:'DDR5 128GB RAM',model:'[마이크론] 128GB (64Gx2) Crucial DDR5-5600 CL46 PRO 패키지',price:3078000},
+    {id:'p463',section:'DDR5 128GB RAM',model:'[SK 하이닉스] 128GB (32GBx4) DDR5-5600',price:3212000},
+    {id:'p464',section:'DDR5 128GB RAM',model:'[G.SKILL] 128GB (64GBx2) DDR5-6000 CL34 TRIDENT Z5 RGB 블랙',price:4997400},
+    {id:'p465',section:'DDR5 128GB RAM',model:'[마이크론] 256GB (64Gx4) Crucial DDR5-5600 CL46 PRO 패키지',price:6156000},
+    {id:'p466',section:'DDR5 ECC 메모리 [서버용] (사파이어래피드, 스레드리퍼 전용)',model:'[삼성전자] 32GB (32GBx1) DDR5-5600 ECC/REG',price:1953600},
+    {id:'p467',section:'DDR5 ECC 메모리 [서버용] (사파이어래피드, 스레드리퍼 전용)',model:'[삼성전자] 32GB (32GBx1) DDR5-6400 ECC/REG',price:1986900},
+    {id:'p468',section:'DDR5 ECC 메모리 [서버용] (사파이어래피드, 스레드리퍼 전용)',model:'[삼성전자] 64GB (32GBx2) DDR5-5600 ECC/REG',price:3907200},
+    {id:'p469',section:'DDR5 ECC 메모리 [서버용] (사파이어래피드, 스레드리퍼 전용)',model:'[삼성전자] 64GB (32GBx2) DDR5-6400 ECC/REG',price:3973800},
+    {id:'p470',section:'DDR5 ECC 메모리 [서버용] (사파이어래피드, 스레드리퍼 전용)',model:'[삼성전자] 64GB (64GBx1) DDR5-5600 ECC/REG',price:4073700},
+    {id:'p471',section:'DDR5 ECC 메모리 [서버용] (사파이어래피드, 스레드리퍼 전용)',model:'[삼성전자] 64GB (64GBx1) DDR5-6400 ECC/REG',price:4162500},
+    {id:'p472',section:'DDR5 ECC 메모리 [서버용] (사파이어래피드, 스레드리퍼 전용)',model:'[삼성전자] 96GB (96GBx1) DDR5-6400 ECC/REG',price:6993000},
+    {id:'p473',section:'DDR5 ECC 메모리 [서버용] (사파이어래피드, 스레드리퍼 전용)',model:'[삼성전자] 128GB (32GBx4) DDR5-5600 ECC/REG',price:7814400},
+    {id:'p474',section:'DDR5 ECC 메모리 [서버용] (사파이어래피드, 스레드리퍼 전용)',model:'[삼성전자] 128GB (32GBx4) DDR5-6400 ECC/REG',price:7947600},
+    {id:'p475',section:'DDR5 ECC 메모리 [서버용] (사파이어래피드, 스레드리퍼 전용)',model:'[삼성전자] 128GB (64GBx2) DDR5-5600 ECC/REG',price:8147400},
+    {id:'p476',section:'DDR5 ECC 메모리 [서버용] (사파이어래피드, 스레드리퍼 전용)',model:'[삼성전자] 128GB (64GBx2) DDR5-6400 ECC/REG',price:8325000},
+    {id:'p477',section:'DDR5 ECC 메모리 [서버용] (사파이어래피드, 스레드리퍼 전용)',model:'[삼성전자] 192GB (96GBx2) DDR5-6400 ECC/REG',price:13986000},
+    {id:'p478',section:'DDR5 ECC 메모리 [서버용] (사파이어래피드, 스레드리퍼 전용)',model:'[삼성전자] 256GB (32GBx8) DDR5-5600 ECC/REG',price:15628800},
+    {id:'p479',section:'DDR5 ECC 메모리 [서버용] (사파이어래피드, 스레드리퍼 전용)',model:'[삼성전자] 256GB (32GBx8) DDR5-6400 ECC/REG',price:15895200},
+    {id:'p480',section:'DDR5 ECC 메모리 [서버용] (사파이어래피드, 스레드리퍼 전용)',model:'[삼성전자] 256GB (64GBx4) DDR5-5600 ECC/REG',price:16294800},
+    {id:'p481',section:'DDR5 ECC 메모리 [서버용] (사파이어래피드, 스레드리퍼 전용)',model:'[삼성전자] 256GB (64GBx4) DDR5-6400 ECC/REG',price:16650000},
+    {id:'p482',section:'DDR5 ECC 메모리 [서버용] (사파이어래피드, 스레드리퍼 전용)',model:'[삼성전자] 256GB (128GBx2) DDR5-5600 ECC/REG',price:17094000},
+    {id:'p483',section:'DDR5 ECC 메모리 [서버용] (사파이어래피드, 스레드리퍼 전용)',model:'[삼성전자] 384GB (96GBx4) DDR5-6400 ECC/REG',price:27972000},
+    {id:'p484',section:'DDR5 ECC 메모리 [서버용] (사파이어래피드, 스레드리퍼 전용)',model:'[삼성전자] 512GB (64GBx8) DDR5-5600 ECC/REG',price:32589600},
+    {id:'p485',section:'DDR5 ECC 메모리 [서버용] (사파이어래피드, 스레드리퍼 전용)',model:'[삼성전자] 512GB (64GBx8) DDR5-6400 ECC/REG',price:33300000},
+    {id:'p486',section:'DDR5 ECC 메모리 [서버용] (사파이어래피드, 스레드리퍼 전용)',model:'[삼성전자] 512GB (128GBx4) DDR5-5600 ECC/REG',price:34188000},
+    {id:'p487',section:'DDR5 ECC 메모리 [서버용] (사파이어래피드, 스레드리퍼 전용)',model:'[삼성전자] 768GB (96GBx8) DDR5-6400 ECC/REG',price:55944000},
+    {id:'p488',section:'DDR5 ECC 메모리 [서버용] (사파이어래피드, 스레드리퍼 전용)',model:'[삼성전자] 1024GB (128GBx8) DDR5-5600 ECC/REG',price:68376000},
   ]},
-  GPU:{label:'GPU',color:'#475569',bg:'#f1f5f9',items:[
-    {id:'g_excel_1',model:'RTX 5050 (그래픽카드 1개 장착 / TDP 100W)',price:457000},
-    {id:'g_excel_2',model:'RTX 5050 (2개 장착 | TDP 100W × 2)',price:457000},
-    {id:'g_excel_3',model:'RTX 5060 (그래픽카드 1개 장착 / TDP 100W)',price:537520},
-    {id:'g_excel_4',model:'RTX 5070 (TDP 250W)',price:1084940},
-    {id:'g_excel_5',model:'RTX 5080 (TDP 360W)',price:2079950},
-    {id:'g_excel_6',model:'NVIDIA Blackwell RTX PRO 4000 D7 24GB, 140W Blower',price:3086000},
-    {id:'g1',model:'MSI RTX 5050 쉐도우 2X OC D6 8GB',price:453000},
-    {id:'g2',model:'MSI RTX 5050 벤투스 2X OC D6 8GB',price:458000},
-    {id:'g3',model:'MSI RTX 5070 벤투스 2X OC D7 12GB',price:969000},
-    {id:'g4',model:'MSI RTX 5070 게이밍 트리오 OC D7 12GB',price:1130000},
-    {id:'g6',model:'PNY RTX 5070 OC D7 12GB Triple Fan',price:980000},
-    {id:'g7',model:'NVIDIA RTX PRO 4000 Blackwell D7 24GB',price:3086000},
-    {id:'g8',model:'NVIDIA RTX PRO 4000 Blackwell D7 24GB (2nd)',price:3498000},
-    {id:'g9',model:'NVIDIA RTX PRO 6000 Blackwell WS D7 96GB',price:18447000},
+  GPU:{label:'그래픽카드(GPU)',color:'#475569',bg:'#f1f5f9',items:[
+    {id:'p489',section:'GT710·GT730·GT1030·1050Ti [보급형 그래픽카드, 사무, 2D게임]',model:'[FORSA] 지포스 GT710 D3 2GB LP (슬림/LP타입)',price:60500},
+    {id:'p490',section:'GT710·GT730·GT1030·1050Ti [보급형 그래픽카드, 사무, 2D게임]',model:'[AFOX] 지포스 GT710 L5 D3 1GB LP 디멘티컴 (슬림/LP타입)',price:61500},
+    {id:'p491',section:'GT710·GT730·GT1030·1050Ti [보급형 그래픽카드, 사무, 2D게임]',model:'[갤럭시] GALAX 지포스 GT710 D3 1GB LP 무소음 (슬림/LP타입)',price:61800},
+    {id:'p492',section:'GT710·GT730·GT1030·1050Ti [보급형 그래픽카드, 사무, 2D게임]',model:'[AFOX] 지포스 GT730 D3 2GB LP 무소음',price:63800},
+    {id:'p493',section:'GT710·GT730·GT1030·1050Ti [보급형 그래픽카드, 사무, 2D게임]',model:'[갤럭시] GALAX 지포스 GT730 D3 4GB LP (슬림/LP타입)',price:77300},
+    {id:'p494',section:'GT710·GT730·GT1030·1050Ti [보급형 그래픽카드, 사무, 2D게임]',model:'[MSI] 지포스 GT1030 에어로 ITX OC D4 2GB',price:129000},
+    {id:'p495',section:'GT710·GT730·GT1030·1050Ti [보급형 그래픽카드, 사무, 2D게임]',model:'[갤럭시] GALAX 지포스 GT1030 강아지 EXOC D5 2GB LP (슬림/LP타입)',price:136000},
+    {id:'p496',section:'GT710·GT730·GT1030·1050Ti [보급형 그래픽카드, 사무, 2D게임]',model:'[갤럭시] GALAX 지포스 GT1030 D5 2GB',price:137800},
+    {id:'p497',section:'GT710·GT730·GT1030·1050Ti [보급형 그래픽카드, 사무, 2D게임]',model:'[액슬] 지포스 GTX1050 Ti D5 4GB 에즈윈',price:193800},
+    {id:'p498',section:'GT710·GT730·GT1030·1050Ti [보급형 그래픽카드, 사무, 2D게임]',model:'[이엠텍] 지포스 GTX 1050 Ti MIRACLE II D5 4GB',price:201600},
+    {id:'p499',section:'GTX1660·RTX3050·RX 6600 [고급형 그래픽카드, 3D온라인게임]',model:'[갤럭시] GALAX 지포스 GTX 1660 SUPER OC D6 6GB',price:296700},
+    {id:'p500',section:'GTX1660·RTX3050·RX 6600 [고급형 그래픽카드, 3D온라인게임]',model:'[이엠텍] 지포스 GTX 1660 SUPER MIRACLE II D6 6GB',price:313600},
+    {id:'p501',section:'GTX1660·RTX3050·RX 6600 [고급형 그래픽카드, 3D온라인게임]',model:'[MSI] 지포스 RTX 3050 벤투스 2X E OC D6 6GB',price:330300},
+    {id:'p502',section:'GTX1660·RTX3050·RX 6600 [고급형 그래픽카드, 3D온라인게임]',model:'[이엠텍] 지포스 RTX 3050 MIRACLE WHITE D6 6GB',price:337700},
+    {id:'p503',section:'GTX1660·RTX3050·RX 6600 [고급형 그래픽카드, 3D온라인게임]',model:'[ASRock] 라데온 RX 6600 CHALLENGER D D6 8GB',price:347700},
+    {id:'p504',section:'GTX1660·RTX3050·RX 6600 [고급형 그래픽카드, 3D온라인게임]',model:'[ASUS] DUAL 지포스 RTX 3050 O6G OC D6 6GB',price:356000},
+    {id:'p505',section:'RTX5050·RX7600·RX9060 [고사양 3D 온라인게임, 그래픽작업]',model:'[MSI] 지포스 RTX 5050 쉐도우 2X OC D6 8GB',price:421800},
+    {id:'p506',section:'RTX5050·RX7600·RX9060 [고사양 3D 온라인게임, 그래픽작업]',model:'[ASRock] 라데온 RX 7600 CHALLENGER OC D6 8GB',price:442800},
+    {id:'p507',section:'RTX5050·RX7600·RX9060 [고사양 3D 온라인게임, 그래픽작업]',model:'[GIGABYTE] 라데온 RX 7600 GAMING OC D6 8GB',price:442800},
+    {id:'p508',section:'RTX5050·RX7600·RX9060 [고사양 3D 온라인게임, 그래픽작업]',model:'[GIGABYTE] 지포스 RTX 5050 WINDFORCE OC D6 8GB',price:445200},
+    {id:'p509',section:'RTX5050·RX7600·RX9060 [고사양 3D 온라인게임, 그래픽작업]',model:'[ZOTAC] GAMING 지포스 RTX 5050 Twin Edge D6 8GB',price:446000},
+    {id:'p510',section:'RTX5050·RX7600·RX9060 [고사양 3D 온라인게임, 그래픽작업]',model:'[MANLI] 지포스 RTX 5050 Nebula D6 8GB',price:446800},
+    {id:'p511',section:'RTX5050·RX7600·RX9060 [고사양 3D 온라인게임, 그래픽작업]',model:'[MSI] 지포스 RTX 5050 벤투스 2X OC D6 8GB',price:447400},
+    {id:'p512',section:'RTX5050·RX7600·RX9060 [고사양 3D 온라인게임, 그래픽작업]',model:'[이엠텍] 지포스 RTX 5050 MIRACLE WHITE D6 8GB',price:448800},
+    {id:'p513',section:'RTX5050·RX7600·RX9060 [고사양 3D 온라인게임, 그래픽작업]',model:'[ASUS] DUAL 지포스 RTX 5050 D6 8GB',price:449000},
+    {id:'p514',section:'RTX5050·RX7600·RX9060 [고사양 3D 온라인게임, 그래픽작업]',model:'[ZOTAC] GAMING 지포스 RTX 5050 Twin Edge OC White D6 8GB',price:456000},
+    {id:'p515',section:'RTX5050·RX7600·RX9060 [고사양 3D 온라인게임, 그래픽작업]',model:'[GIGABYTE] 지포스 RTX 5050 GAMING OC D6 8GB',price:457300},
+    {id:'p516',section:'RTX5050·RX7600·RX9060 [고사양 3D 온라인게임, 그래픽작업]',model:'[갤럭시] GALAX 지포스 RTX 5050 BLACK OC D6 8GB DUAL HDMI',price:459200},
+    {id:'p517',section:'RTX5050·RX7600·RX9060 [고사양 3D 온라인게임, 그래픽작업]',model:'[ASRock] 라데온 RX 9060 Challenger D6 8GB',price:467000},
+    {id:'p518',section:'RTX5050·RX7600·RX9060 [고사양 3D 온라인게임, 그래픽작업]',model:'[SAPPHIRE] 라데온 RX 7600 PULSE OC D6 8GB',price:497100},
+    {id:'p519',section:'RTX5060·RX9060 [3D온라인게임, 영상편집, 그래픽작업]',model:'[XFX] 라데온 RX 9060 SWIFT DUAL D6 8GB',price:472400},
+    {id:'p520',section:'RTX5060·RX9060 [3D온라인게임, 영상편집, 그래픽작업]',model:'[ASUS] DUAL 라데온 RX 9060 D6 8GB',price:478800},
+    {id:'p521',section:'RTX5060·RX9060 [3D온라인게임, 영상편집, 그래픽작업]',model:'[MSI] 지포스 RTX 5060 쉐도우 2X OC D7 8GB Hit',price:503300},
+    {id:'p522',section:'RTX5060·RX9060 [3D온라인게임, 영상편집, 그래픽작업]',model:'[MSI] 지포스 RTX 5060 벤투스 2X OC D7 8GB',price:513000},
+    {id:'p523',section:'RTX5060·RX9060 [3D온라인게임, 영상편집, 그래픽작업]',model:'[GIGABYTE] 지포스 RTX 5060 EAGLE OC D7 8GB',price:536500},
+    {id:'p524',section:'RTX5060·RX9060 [3D온라인게임, 영상편집, 그래픽작업]',model:'[COLORFUL] 지포스 RTX 5060 토마호크 DUO D7 8GB',price:547000},
+    {id:'p525',section:'RTX5060·RX9060 [3D온라인게임, 영상편집, 그래픽작업]',model:'[PALIT] 지포스 RTX 5060 DUAL OC D7 8GB 이엠텍',price:547200},
+    {id:'p526',section:'RTX5060·RX9060 [3D온라인게임, 영상편집, 그래픽작업]',model:'[이엠텍] 지포스 RTX 5060 MIRACLE WHITE D7 8GB',price:549400},
+    {id:'p527',section:'RTX5060·RX9060 [3D온라인게임, 영상편집, 그래픽작업]',model:'[PALIT] 지포스 RTX 5060 WHITE OC D7 8GB 이엠텍',price:549600},
+    {id:'p528',section:'RTX5060·RX9060 [3D온라인게임, 영상편집, 그래픽작업]',model:'[ASUS] DUAL 지포스 RTX 5060 OC D7 8GB',price:552400},
+    {id:'p529',section:'RTX5060·RX9060 [3D온라인게임, 영상편집, 그래픽작업]',model:'[MANLI] 지포스 RTX 5060 Polar Fox D7 OC 8GB (화이트)',price:553700},
+    {id:'p530',section:'RTX5060·RX9060 [3D온라인게임, 영상편집, 그래픽작업]',model:'[ZOTAC] GAMING 지포스 RTX 5060 Twin Edge OC D7 8GB',price:554600},
+    {id:'p531',section:'RTX5060·RX9060 [3D온라인게임, 영상편집, 그래픽작업]',model:'[GIGABYTE] 지포스 RTX 5060 WINDFORCE MAX OC D7 8GB',price:557600},
+    {id:'p532',section:'RTX5060·RX9060 [3D온라인게임, 영상편집, 그래픽작업]',model:'[갤럭시] GALAX 지포스 RTX 5060 EX BLACK OC D7 8GB',price:566400},
+    {id:'p533',section:'RTX5060·RX9060 [3D온라인게임, 영상편집, 그래픽작업]',model:'[갤럭시] GALAX 지포스 RTX 5060 EX WHITE OC D7 8GB',price:571200},
+    {id:'p534',section:'RTX5060·RX9060 [3D온라인게임, 영상편집, 그래픽작업]',model:'[COLORFUL] iGame 지포스 RTX 5060 ULTRA DUO OC White D7 8GB',price:572600},
+    {id:'p535',section:'RTX5060·RX9060 [3D온라인게임, 영상편집, 그래픽작업]',model:'[MANLI] 지포스 RTX 5060 Nebula D7 8GB',price:576800},
+    {id:'p536',section:'RTX5060·RX9060 [3D온라인게임, 영상편집, 그래픽작업]',model:'[ZOTAC] GAMING 지포스 RTX 5060 Twin Edge OC White D7 8GB',price:577600},
+    {id:'p537',section:'RTX5060·RX9060 [3D온라인게임, 영상편집, 그래픽작업]',model:'[GIGABYTE] 지포스 RTX 5060 GAMING OC D7 8GB',price:577900},
+    {id:'p538',section:'RTX5060 Ti·RX9060XT [고사양 3D온라인게임, 영상편집, 그래픽작업]',model:'[ASRock] 라데온 RX 9060 XT 스틸레전드 OC D6 8GB',price:573400},
+    {id:'p539',section:'RTX5060 Ti·RX9060XT [고사양 3D온라인게임, 영상편집, 그래픽작업]',model:'[GIGABYTE] 지포스 RTX 5060 Ti WINDFORCE MAX OC D7 8GB',price:575700},
+    {id:'p540',section:'RTX5060 Ti·RX9060XT [고사양 3D온라인게임, 영상편집, 그래픽작업]',model:'[SAPPHIRE] 라데온 RX 9060 XT PULSE OC D6 8GB',price:581300},
+    {id:'p541',section:'RTX5060 Ti·RX9060XT [고사양 3D온라인게임, 영상편집, 그래픽작업]',model:'[ASUS] DUAL 지포스 RTX 5060 Ti OC D7 8GB',price:584000},
+    {id:'p542',section:'RTX5060 Ti·RX9060XT [고사양 3D온라인게임, 영상편집, 그래픽작업]',model:'[MSI] 지포스 RTX 5060 Ti 벤투스 2X OC 플러스 D7 8GB Hit',price:594100},
+    {id:'p543',section:'RTX5060 Ti·RX9060XT [고사양 3D온라인게임, 영상편집, 그래픽작업]',model:'[GAINWARD] 지포스 RTX 5060 Ti 고스트 D7 8GB',price:597000},
+    {id:'p544',section:'RTX5060 Ti·RX9060XT [고사양 3D온라인게임, 영상편집, 그래픽작업]',model:'[ASUS] DUAL 지포스 RTX 5060 Ti WHITE OC D7 8GB (화이트)',price:607400},
+    {id:'p545',section:'RTX5060 Ti·RX9060XT [고사양 3D온라인게임, 영상편집, 그래픽작업]',model:'[MANLI] 지포스 RTX 5060 Ti Polar Fox D7 OC 8GB (화이트)',price:617000},
+    {id:'p546',section:'RTX5060 Ti·RX9060XT [고사양 3D온라인게임, 영상편집, 그래픽작업]',model:'[COLORFUL] 지포스 RTX 5060 Ti GAMING DUO D7 8GB',price:617400},
+    {id:'p547',section:'RTX5060 Ti·RX9060XT [고사양 3D온라인게임, 영상편집, 그래픽작업]',model:'[PNY] 지포스 RTX 5060 Ti OC D7 8GB Dual Fan',price:618400},
+    {id:'p548',section:'RTX5060 Ti·RX9060XT [고사양 3D온라인게임, 영상편집, 그래픽작업]',model:'[MSI] 지포스 RTX 5060 Ti 쉐도우 2X OC 플러스 D7 8GB',price:624600},
+    {id:'p549',section:'RTX5060 Ti·RX9060XT [고사양 3D온라인게임, 영상편집, 그래픽작업]',model:'[ZOTAC] GAMING 지포스 RTX 5060 Ti Twin Edge OC D7 8GB',price:637200},
+    {id:'p550',section:'RTX5060 Ti·RX9060XT [고사양 3D온라인게임, 영상편집, 그래픽작업]',model:'[PowerColor] 라데온 RX 9060 XT REAPER White D6 16GB (화이트)',price:649800},
+    {id:'p551',section:'RTX5060 Ti·RX9060XT [고사양 3D온라인게임, 영상편집, 그래픽작업]',model:'[PowerColor] 라데온 RX 9060 XT Hellhound Spectral White OC D6 16GB',price:654700},
+    {id:'p552',section:'RTX5060 Ti·RX9060XT [고사양 3D온라인게임, 영상편집, 그래픽작업]',model:'[PALIT] 지포스 RTX 5060 Ti DUAL D7 8GB 이엠텍',price:681500},
+    {id:'p553',section:'RTX5060 Ti·RX9060XT [고사양 3D온라인게임, 영상편집, 그래픽작업]',model:'[MANLI] 지포스 RTX 5060 Ti Nebula D7 8GB',price:683200},
+    {id:'p554',section:'RTX5060 Ti·RX9060XT [고사양 3D온라인게임, 영상편집, 그래픽작업]',model:'[GIGABYTE] 라데온 RX 9060 XT Gaming OC D6 16GB',price:683200},
+    {id:'p555',section:'RTX5060 Ti·RX9060XT [고사양 3D온라인게임, 영상편집, 그래픽작업]',model:'[ASRock] 라데온 RX 9060 XT Challenger OC D6 16GB',price:687500},
+    {id:'p556',section:'RTX5060 Ti·RX9060XT [고사양 3D온라인게임, 영상편집, 그래픽작업]',model:'[이엠텍] 지포스 RTX 5060 Ti MIRACLE X2 WHITE D7 8GB',price:692400},
+    {id:'p557',section:'RTX5060 Ti·RX9060XT [고사양 3D온라인게임, 영상편집, 그래픽작업]',model:'[PowerColor] 라데온 RX 9060 XT HELLHOUND D6 16GB',price:695000},
+    {id:'p558',section:'RTX5060 Ti·RX9060XT [고사양 3D온라인게임, 영상편집, 그래픽작업]',model:'[ASRock] 라데온 RX 9060 XT 스틸레전드 OC D6 16GB Hit',price:696600},
+    {id:'p559',section:'RTX5060 Ti·RX9060XT [고사양 3D온라인게임, 영상편집, 그래픽작업]',model:'[갤럭시] GALAX 지포스 RTX 5060 Ti BLACK OC D7 8GB',price:699300},
+    {id:'p560',section:'RTX5060 Ti·RX9060XT [고사양 3D온라인게임, 영상편집, 그래픽작업]',model:'[GIGABYTE] 지포스 RTX 5060 Ti AERO OC D7 8GB (화이트)',price:714000},
+    {id:'p561',section:'RTX5060 Ti·RX9060XT [고사양 3D온라인게임, 영상편집, 그래픽작업]',model:'[COLORFUL] iGame 지포스 RTX 5060 Ti ULTRA DUO OC White D7 8GB',price:714000},
+    {id:'p562',section:'RTX5060 Ti·RX9060XT [고사양 3D온라인게임, 영상편집, 그래픽작업]',model:'[ASUS] DUAL 라데온 RX 9060 XT D6 16GB',price:717600},
+    {id:'p563',section:'RTX5060 Ti·RX9060XT [고사양 3D온라인게임, 영상편집, 그래픽작업]',model:'[GIGABYTE] 라데온 RX 9060 XT Gaming OC ICE D6 16GB',price:737360},
+    {id:'p564',section:'RTX5060 Ti·RX9060XT [고사양 3D온라인게임, 영상편집, 그래픽작업]',model:'[ASUS] TUF Gaming 지포스 RTX 5060 Ti OC D7 8GB',price:747400},
+    {id:'p565',section:'RTX5060 Ti·RX9060XT [고사양 3D온라인게임, 영상편집, 그래픽작업]',model:'[SAPPHIRE] 라데온 RX 9060 XT PULSE OC D6 16GB',price:771000},
+    {id:'p566',section:'RTX5060 Ti·RX9060XT [고사양 3D온라인게임, 영상편집, 그래픽작업]',model:'[SAPPHIRE] 라데온 RX 9060 XT PURE OC D6 16GB',price:794000},
+    {id:'p567',section:'RTX5060 Ti·RX9060XT [고사양 3D온라인게임, 영상편집, 그래픽작업]',model:'[SAPPHIRE] 라데온 RX 9060 XT NITRO+ OC D6 16GB',price:841000},
+    {id:'p568',section:'RTX5060 Ti·RX9060XT [고사양 3D온라인게임, 영상편집, 그래픽작업]',model:'[ASUS] PRIME 라데온 RX 9060 XT OC D6 16GB',price:867000},
+    {id:'p569',section:'RTX5060 Ti·RX9060XT [고사양 3D온라인게임, 영상편집, 그래픽작업]',model:'[PALIT] 지포스 RTX 5060 Ti INFINITY 3 D7 16GB 이엠텍',price:914800},
+    {id:'p570',section:'RTX5060 Ti·RX9060XT [고사양 3D온라인게임, 영상편집, 그래픽작업]',model:'[GAINWARD] 지포스 RTX 5060 Ti 파이썬 III D7 16GB',price:925200},
+    {id:'p571',section:'RTX5060 Ti·RX9060XT [고사양 3D온라인게임, 영상편집, 그래픽작업]',model:'[PALIT] 지포스 RTX 5060 Ti WHITE OC D7 16GB 이엠텍',price:926700},
+    {id:'p572',section:'RTX5060 Ti·RX9060XT [고사양 3D온라인게임, 영상편집, 그래픽작업]',model:'[COLORFUL] 지포스 RTX 5060 Ti GAMING DUO D7 16GB',price:929500},
+    {id:'p573',section:'RTX5060 Ti·RX9060XT [고사양 3D온라인게임, 영상편집, 그래픽작업]',model:'[갤럭시] GALAX 지포스 RTX 5060 Ti BLACK OC D7 16GB',price:932400},
+    {id:'p574',section:'RTX5060 Ti·RX9060XT [고사양 3D온라인게임, 영상편집, 그래픽작업]',model:'[GIGABYTE] 지포스 RTX 5060 Ti EAGLE OC ICE D7 16GB',price:935200},
+    {id:'p575',section:'RTX5070·9070 [3D게임, 3D랜더링, 전문 그래픽작업, 4K영상편집, 원컴방송]',model:'[GIGABYTE] 라데온 RX 9070 GAMING OC D6 16GB',price:931000},
+    {id:'p576',section:'RTX5070·9070 [3D게임, 3D랜더링, 전문 그래픽작업, 4K영상편집, 원컴방송]',model:'[SAPPHIRE] 라데온 RX 9070 PULSE D6 16GB',price:969000},
+    {id:'p577',section:'RTX5070·9070 [3D게임, 3D랜더링, 전문 그래픽작업, 4K영상편집, 원컴방송]',model:'[MSI] 지포스 RTX 5070 벤투스 2X OC D7 12GB',price:976700},
+    {id:'p578',section:'RTX5070·9070 [3D게임, 3D랜더링, 전문 그래픽작업, 4K영상편집, 원컴방송]',model:'[MSI] 지포스 RTX 5070 벤투스 3X OC D7 12GB',price:986500},
+    {id:'p579',section:'RTX5070·9070 [3D게임, 3D랜더링, 전문 그래픽작업, 4K영상편집, 원컴방송]',model:'[COLORFUL] 지포스 RTX 5070 GAMING D7 12GB',price:987900},
+    {id:'p580',section:'RTX5070·9070 [3D게임, 3D랜더링, 전문 그래픽작업, 4K영상편집, 원컴방송]',model:'[GIGABYTE] 지포스 RTX 5070 WINDFORCE OC SFF D7 12GB',price:1019700},
+    {id:'p581',section:'RTX5070·9070 [3D게임, 3D랜더링, 전문 그래픽작업, 4K영상편집, 원컴방송]',model:'[PALIT] 지포스 RTX 5070 INFINITY 3 D7 12GB 이엠텍',price:1021700},
+    {id:'p582',section:'RTX5070·9070 [3D게임, 3D랜더링, 전문 그래픽작업, 4K영상편집, 원컴방송]',model:'[ASUS] DUAL 지포스 RTX 5070 OC D7 12GB',price:1054500},
+    {id:'p583',section:'RTX5070·9070 [3D게임, 3D랜더링, 전문 그래픽작업, 4K영상편집, 원컴방송]',model:'[COLORFUL] iGame 지포스 RTX 5070 ULTRA OC White D7 12GB',price:1054900},
+    {id:'p584',section:'RTX5070·9070 [3D게임, 3D랜더링, 전문 그래픽작업, 4K영상편집, 원컴방송]',model:'[PALIT] 지포스 RTX 5070 WHITE OC D7 12GB 이엠텍',price:1061500},
+    {id:'p585',section:'RTX5070·9070 [3D게임, 3D랜더링, 전문 그래픽작업, 4K영상편집, 원컴방송]',model:'[이엠텍] 지포스 RTX 5070 MIRACLE WHITE D7 12GB',price:1061900},
+    {id:'p586',section:'RTX5070·9070 [3D게임, 3D랜더링, 전문 그래픽작업, 4K영상편집, 원컴방송]',model:'[ASUS] PRIME 라데온 RX 9070 EVO OC D6 16GB',price:1064000},
+    {id:'p587',section:'RTX5070·9070 [3D게임, 3D랜더링, 전문 그래픽작업, 4K영상편집, 원컴방송]',model:'[ASUS] PRIME 지포스 RTX 5070 OC D7 12GB',price:1088500},
+    {id:'p588',section:'RTX5070·9070 [3D게임, 3D랜더링, 전문 그래픽작업, 4K영상편집, 원컴방송]',model:'[MSI] 지포스 RTX 5070 게이밍 트리오 OC D7 12GB 트라이프로져4',price:1097600},
+    {id:'p589',section:'RTX5070 Ti·9070XT [3D랜더링, 전문 그래픽작업, 4K영상편집, 원컴방송]',model:'[ASUS] PRIME 라데온 RX 9070 XT OC D6 16GB',price:1057000},
+    {id:'p590',section:'RTX5070 Ti·9070XT [3D랜더링, 전문 그래픽작업, 4K영상편집, 원컴방송]',model:'[GIGABYTE] 라데온 RX 9070 XT GAMING OC D6 16GB',price:1087000},
+    {id:'p591',section:'RTX5070 Ti·9070XT [3D랜더링, 전문 그래픽작업, 4K영상편집, 원컴방송]',model:'[ASRock] 라데온 RX 9070 XT CHALLENGER D6 16GB',price:1117000},
+    {id:'p592',section:'RTX5070 Ti·9070XT [3D랜더링, 전문 그래픽작업, 4K영상편집, 원컴방송]',model:'[ASRock] 라데온 RX 9070 XT 스틸레전드 D6 16GB',price:1137000},
+    {id:'p593',section:'RTX5070 Ti·9070XT [3D랜더링, 전문 그래픽작업, 4K영상편집, 원컴방송]',model:'[GIGABYTE] 라데온 RX 9070 XT GAMING OC ICE D6 16GB',price:1147000},
+    {id:'p594',section:'RTX5070 Ti·9070XT [3D랜더링, 전문 그래픽작업, 4K영상편집, 원컴방송]',model:'[SAPPHIRE] 라데온 RX 9070 XT NITRO+ OC D6 16GB',price:1387000},
+    {id:'p595',section:'RTX5070 Ti·9070XT [3D랜더링, 전문 그래픽작업, 4K영상편집, 원컴방송]',model:'[MSI] 지포스 RTX 5070 Ti 벤투스 3X OC D7 16GB',price:1562000},
+    {id:'p596',section:'RTX5070 Ti·9070XT [3D랜더링, 전문 그래픽작업, 4K영상편집, 원컴방송]',model:'[GIGABYTE] 지포스 RTX 5070 Ti WINDFORCE OC SFF D7 16GB',price:1573000},
+    {id:'p597',section:'RTX5070 Ti·9070XT [3D랜더링, 전문 그래픽작업, 4K영상편집, 원컴방송]',model:'[PALIT] 지포스 RTX 5070 Ti GAMINGPRO-S OC D7 16GB 이엠텍',price:1600600},
+    {id:'p598',section:'RTX5070 Ti·9070XT [3D랜더링, 전문 그래픽작업, 4K영상편집, 원컴방송]',model:'[COLORFUL] iGame 지포스 RTX 5070 Ti ULTRA OC White D7 16GB',price:1603800},
+    {id:'p599',section:'RTX5070 Ti·9070XT [3D랜더링, 전문 그래픽작업, 4K영상편집, 원컴방송]',model:'[GAINWARD] 지포스 RTX 5070 Ti 피닉스-S D7 16GB',price:1631700},
+    {id:'p600',section:'RTX5070 Ti·9070XT [3D랜더링, 전문 그래픽작업, 4K영상편집, 원컴방송]',model:'[MSI] 지포스 RTX 5070 Ti 게이밍 트리오 OC D7 16GB 트라이프로져4',price:1632900},
+    {id:'p601',section:'RTX5070 Ti·9070XT [3D랜더링, 전문 그래픽작업, 4K영상편집, 원컴방송]',model:'[GIGABYTE] 지포스 RTX 5070 Ti GAMING OC D7 16GB',price:1634600},
+    {id:'p602',section:'RTX5070 Ti·9070XT [3D랜더링, 전문 그래픽작업, 4K영상편집, 원컴방송]',model:'[GIGABYTE] 지포스 RTX 5070 Ti AERO OC D7 16GB',price:1634600},
+    {id:'p603',section:'RTX5070 Ti·9070XT [3D랜더링, 전문 그래픽작업, 4K영상편집, 원컴방송]',model:'[ZOTAC] GAMING 지포스 RTX 5070 Ti SOLID OC D7 16GB',price:1685900},
+    {id:'p604',section:'RTX5070 Ti·9070XT [3D랜더링, 전문 그래픽작업, 4K영상편집, 원컴방송]',model:'[갤럭시] GALAX 지포스 RTX 5070 Ti EX GAMER BLACK OC D7 16GB',price:1687200},
+    {id:'p605',section:'RTX5070 Ti·9070XT [3D랜더링, 전문 그래픽작업, 4K영상편집, 원컴방송]',model:'[갤럭시] GALAX 지포스 RTX 5070 Ti EX GAMER WHITE OC D7 16GB',price:1709400},
+    {id:'p606',section:'RTX5070 Ti·9070XT [3D랜더링, 전문 그래픽작업, 4K영상편집, 원컴방송]',model:'[ASUS] PRIME 지포스 RTX 5070 Ti OC D7 16GB',price:1751000},
+    {id:'p607',section:'RTX5070 Ti·9070XT [3D랜더링, 전문 그래픽작업, 4K영상편집, 원컴방송]',model:'[ZOTAC] GAMING 지포스 RTX 5070 Ti AMP Extreme Infinity D7 16GB',price:1813000},
+    {id:'p608',section:'RTX5070 Ti·9070XT [3D랜더링, 전문 그래픽작업, 4K영상편집, 원컴방송]',model:'[ASUS] TUF Gaming 지포스 RTX 5070 Ti OC D7 16GB White',price:1918500},
+    {id:'p609',section:'RTX5080 [3D설계, 4K영상편집, 하이엔드]',model:'[MSI] 지포스 RTX 5080 벤투스 3X OC D7 16GB',price:2096100},
+    {id:'p610',section:'RTX5080 [3D설계, 4K영상편집, 하이엔드]',model:'[COLORFUL] iGame 지포스 RTX 5080 ULTRA OC White D7 16GB',price:2103700},
+    {id:'p611',section:'RTX5080 [3D설계, 4K영상편집, 하이엔드]',model:'[GIGABYTE] 지포스 RTX 5080 WINDFORCE OC SFF D7 16GB',price:2107900},
+    {id:'p612',section:'RTX5080 [3D설계, 4K영상편집, 하이엔드]',model:'[GIGABYTE] 지포스 RTX 5080 GAMING OC D7 16GB',price:2112000},
+    {id:'p613',section:'RTX5080 [3D설계, 4K영상편집, 하이엔드]',model:'[PALIT] 지포스 RTX 5080 GAMINGPRO D7 16GB 이엠텍',price:2139500},
+    {id:'p614',section:'RTX5080 [3D설계, 4K영상편집, 하이엔드]',model:'[GIGABYTE] 지포스 RTX 5080 AERO OC SFF D7 16GB',price:2159300},
+    {id:'p615',section:'RTX5080 [3D설계, 4K영상편집, 하이엔드]',model:'[MSI] 지포스 RTX 5080 게이밍 트리오 OC D7 16GB 트라이프로져4',price:2218200},
+    {id:'p616',section:'RTX5080 [3D설계, 4K영상편집, 하이엔드]',model:'[이엠텍] 지포스 RTX 5080 MIRACLE WHITE D7 16GB',price:2241000},
+    {id:'p617',section:'RTX5080 [3D설계, 4K영상편집, 하이엔드]',model:'[갤럭시] GALAX 지포스 RTX 5080 BLACK OC D7 16GB',price:2286300},
+    {id:'p618',section:'RTX5080 [3D설계, 4K영상편집, 하이엔드]',model:'[MSI] 지포스 RTX 5080 뱅가드 SOC D7 16GB 하이퍼프로져',price:2287900},
+    {id:'p619',section:'RTX5080 [3D설계, 4K영상편집, 하이엔드]',model:'[ZOTAC] GAMING 지포스 RTX 5080 SOLID OC D7 16GB',price:2297700},
+    {id:'p620',section:'RTX5080 [3D설계, 4K영상편집, 하이엔드]',model:'[ASUS] PRIME 지포스 RTX 5080 OC D7 16GB',price:2312000},
+    {id:'p621',section:'RTX5080 [3D설계, 4K영상편집, 하이엔드]',model:'[COLORFUL] iGame 지포스 RTX 5080 Advanced OC D7 16GB',price:2327000},
+    {id:'p622',section:'RTX5080 [3D설계, 4K영상편집, 하이엔드]',model:'[GIGABYTE] AORUS 지포스 RTX 5080 MASTER D7 16GB',price:2365000},
+    {id:'p623',section:'RTX5080 [3D설계, 4K영상편집, 하이엔드]',model:'[GIGABYTE] AORUS 지포스 RTX 5080 MASTER ICE D7 16GB',price:2365000},
+    {id:'p624',section:'RTX5080 [3D설계, 4K영상편집, 하이엔드]',model:'[갤럭시] GALAX 지포스 RTX 5080 EX GAMER WHITE OC D7 16GB',price:2469800},
+    {id:'p625',section:'RTX5080 [3D설계, 4K영상편집, 하이엔드]',model:'[갤럭시] GALAX 지포스 RTX 5080 WHITE OC D7 16GB',price:2563000},
+    {id:'p626',section:'RTX5080 [3D설계, 4K영상편집, 하이엔드]',model:'[ASUS] 지포스 RTX 5080 OC D7 16GB NOCTUA',price:2761000},
+    {id:'p627',section:'RTX5080 [3D설계, 4K영상편집, 하이엔드]',model:'[ASUS] ProArt 지포스 RTX 5080 OC D7 16GB',price:2845900},
+    {id:'p628',section:'RTX5080 [3D설계, 4K영상편집, 하이엔드]',model:'[ASUS] ROG Astral 지포스 RTX 5080 OC D7 16GB',price:2881000},
+    {id:'p629',section:'RTX5080 [3D설계, 4K영상편집, 하이엔드]',model:'[ASUS] ROG Astral 지포스 RTX 5080 WHITE OC D7 16GB',price:2981000},
+    {id:'p630',section:'RTX5080 [3D설계, 4K영상편집, 하이엔드]',model:'[GIGABYTE] 지포스 RTX 5080 GAMING OC D7 16GB 2way [듀얼]',price:4224000},
+    {id:'p631',section:'RTX5080 [3D설계, 4K영상편집, 하이엔드]',model:'[MSI] 지포스 RTX 5080 게이밍 트리오 OC D7 16GB 트라이프로져4 2way [듀얼]',price:4436400},
+    {id:'p632',section:'RTX5090 [3D설계, 4K영상편집, 하이엔드]',model:'[MSI] 지포스 RTX 5090 슈프림 SOC D7 32GB 하이퍼프로져',price:6962800},
+    {id:'p633',section:'RTX5090 [3D설계, 4K영상편집, 하이엔드]',model:'[GIGABYTE] 지포스 RTX 5090 WINDFORCE OC D7 32GB',price:7386200},
+    {id:'p634',section:'RTX5090 [3D설계, 4K영상편집, 하이엔드]',model:'[GIGABYTE] 지포스 RTX 5090 GAMING OC D7 32GB',price:7436900},
+    {id:'p635',section:'RTX5090 [3D설계, 4K영상편집, 하이엔드]',model:'[GIGABYTE] AORUS 지포스 RTX 5090 MASTER ICE D7 32GB',price:7538400},
+    {id:'p636',section:'RTX5090 [3D설계, 4K영상편집, 하이엔드]',model:'[GIGABYTE] AORUS 지포스 RTX 5090 MASTER D7 32GB',price:7538400},
+    {id:'p637',section:'RTX5090 [3D설계, 4K영상편집, 하이엔드]',model:'[GIGABYTE] AORUS 지포스 RTX 5090 STEALTH ICE D7 32GB',price:7589200},
+    {id:'p638',section:'RTX5090 [3D설계, 4K영상편집, 하이엔드]',model:'[ASUS] TUF Gaming 지포스 RTX 5090 OC D7 32GB',price:7657200},
+    {id:'p639',section:'RTX5090 [3D설계, 4K영상편집, 하이엔드]',model:'[ASUS] ROG Astral 지포스 RTX 5090 OC D7 32GB',price:7765200},
+    {id:'p640',section:'RTX5090 [3D설계, 4K영상편집, 하이엔드]',model:'[ASUS] ROG Astral 지포스 RTX 5090 WHITE OC D7 32GB',price:7862400},
+    {id:'p641',section:'RTX5090 [3D설계, 4K영상편집, 하이엔드]',model:'[MSI] 지포스 RTX 5090 슈프림 SOC D7 32GB 하이퍼프로져 2way [듀얼]',price:13925600},
+    {id:'p642',section:'RTX5090 [3D설계, 4K영상편집, 하이엔드]',model:'[GIGABYTE] 지포스 RTX 5090 GAMING OC D7 32GB 2way [듀얼]',price:14873700},
+    {id:'p643',section:'RTX5090 [3D설계, 4K영상편집, 하이엔드]',model:'[GIGABYTE] 지포스 RTX 5090 GAMING OC D7 32GB 3Way',price:22310700},
+    {id:'p644',section:'인텔 UHD 그래픽코어',model:'[인텔] 내장형 UHD 그래픽코어',price:0},
+    {id:'p645',section:'워크스테이션 [3D랜더링, 3D에니메이션, 시뮬레이션]',model:'[AMD] 라데온 PRO WX3200 D5 4GB LP',price:222900},
+    {id:'p646',section:'워크스테이션 [3D랜더링, 3D에니메이션, 시뮬레이션]',model:'[NVIDIA] RTX A400 D6 4GB',price:295000},
+    {id:'p647',section:'워크스테이션 [3D랜더링, 3D에니메이션, 시뮬레이션]',model:'[AMD] 라데온 PRO W5500 D6 8GB',price:414400},
+    {id:'p648',section:'워크스테이션 [3D랜더링, 3D에니메이션, 시뮬레이션]',model:'[AMD] 라데온 PRO W7600 D6 8GB',price:972200},
+    {id:'p649',section:'워크스테이션 [3D랜더링, 3D에니메이션, 시뮬레이션]',model:'[NVIDIA] RTX 2000 Ada Generation D6 16GB (LP브라켓 포함)',price:1198800},
+    {id:'p650',section:'워크스테이션 [3D랜더링, 3D에니메이션, 시뮬레이션]',model:'[NVIDIA] RTX PRO 2000 Blackwell 16GB (LP) (벌크)',price:1845200},
+    {id:'p651',section:'워크스테이션 [3D랜더링, 3D에니메이션, 시뮬레이션]',model:'[NVIDIA] RTX PRO 2000 Blackwell 16GB (LP) (정품)',price:1860400},
+    {id:'p652',section:'워크스테이션 [3D랜더링, 3D에니메이션, 시뮬레이션]',model:'[인텔] Intel Arc Pro B70 D6 32GB',price:1957000},
+    {id:'p653',section:'워크스테이션 [3D랜더링, 3D에니메이션, 시뮬레이션]',model:'[NVIDIA] RTX 4000 Ada Generation GDDR6 20GB',price:2757700},
+    {id:'p654',section:'워크스테이션 [3D랜더링, 3D에니메이션, 시뮬레이션]',model:'[NVIDIA] RTX PRO 4000 Blackwell D7 24GB (정품)',price:3905500},
+    {id:'p655',section:'워크스테이션 [3D랜더링, 3D에니메이션, 시뮬레이션]',model:'[NVIDIA] RTX PRO 4000 Blackwell SFF 에디션 D7 24GB (정품)',price:3905500},
+    {id:'p656',section:'워크스테이션 [3D랜더링, 3D에니메이션, 시뮬레이션]',model:'[NVIDIA] RTX PRO 4500 Blackwell D7 32GB (정품)',price:5963200},
+    {id:'p657',section:'워크스테이션 [3D랜더링, 3D에니메이션, 시뮬레이션]',model:'[NVIDIA] RTX 5000 Ada Generation D6 32GB',price:7339000},
+    {id:'p658',section:'워크스테이션 [3D랜더링, 3D에니메이션, 시뮬레이션]',model:'[NVIDIA] RTX PRO 5000 Blackwell D7 48GB (정품)',price:11131600},
+    {id:'p659',section:'워크스테이션 [3D랜더링, 3D에니메이션, 시뮬레이션]',model:'[NVIDIA] RTX 6000 Ada Generation D6 48GB',price:12821600},
+    {id:'p660',section:'워크스테이션 [3D랜더링, 3D에니메이션, 시뮬레이션]',model:'[NVIDIA] RTX 5000 Ada Generation D6 32GB x 2way [듀얼]',price:14678000},
+    {id:'p661',section:'워크스테이션 [3D랜더링, 3D에니메이션, 시뮬레이션]',model:'[NVIDIA] RTX PRO 6000 Blackwell 워크스테이션 에디션 D7 96GB (벌크)',price:21270300},
+    {id:'p662',section:'워크스테이션 [3D랜더링, 3D에니메이션, 시뮬레이션]',model:'[NVIDIA] RTX PRO 6000 Blackwell 워크스테이션 에디션 D7 96GB (정품)',price:21498100},
+    {id:'p663',section:'워크스테이션 [3D랜더링, 3D에니메이션, 시뮬레이션]',model:'[NVIDIA] RTX PRO 6000 Blackwell MAX-Q D7 96GB (정품)',price:21498100},
+    {id:'p664',section:'워크스테이션 [3D랜더링, 3D에니메이션, 시뮬레이션]',model:'[NVIDIA] RTX PRO 6000 Blackwell 워크스테이션 96GB 2way [듀얼]',price:42540600},
+    {id:'p665',section:'워크스테이션 [3D랜더링, 3D에니메이션, 시뮬레이션]',model:'[NVIDIA] H100 HBM2e 80GB PCIe',price:45072800},
+    {id:'p666',section:'워크스테이션 [3D랜더링, 3D에니메이션, 시뮬레이션]',model:'[NVIDIA] H100 HBM2e 80GB PCIe x 2way [듀얼]',price:90145600},
+  ]},
+  SSD_C:{label:'M.2 SSD (C드라이브)',color:'#475569',bg:'#f1f5f9',items:[
+    {id:'p667',section:'128GB~512GB M.2 NVMe (SSD)',model:'[파이슨] (256GB) ES0256GHLCJ-EL1 M.2 NVMe 벌크',price:77500},
+    {id:'p668',section:'128GB~512GB M.2 NVMe (SSD)',model:'[키오시아] (256GB) CL4-8D M.2 NVMe 벌크',price:78400},
+    {id:'p669',section:'128GB~512GB M.2 NVMe (SSD)',model:'[COLORFUL] (512GB) CN600 M.2 NVMe',price:137400},
+    {id:'p670',section:'128GB~512GB M.2 NVMe (SSD)',model:'[GIGABYTE] (512GB) Gen3 M.2 NVMe',price:147800},
+    {id:'p671',section:'128GB~512GB M.2 NVMe (SSD)',model:'[GIGABYTE] (500GB) Gen3 2500E M.2 NVMe',price:148700},
+    {id:'p672',section:'128GB~512GB M.2 NVMe (SSD)',model:'[PATRIOT] (512GB) P300 M.2 NVMe',price:152600},
+    {id:'p673',section:'128GB~512GB M.2 NVMe (SSD)',model:'[TeamGroup] (512GB) MP33 M.2 NVMe',price:153900},
+    {id:'p674',section:'128GB~512GB M.2 NVMe (SSD)',model:'[ESSENCORE] (512GB) KLEVV CRAS C715 M.2 NVMe',price:157800},
+    {id:'p675',section:'128GB~512GB M.2 NVMe (SSD)',model:'[ADATA] (512GB) XPG SX8200 Pro M.2 NVMe',price:160200},
+    {id:'p676',section:'128GB~512GB M.2 NVMe (SSD)',model:'[마이크론] (500GB) Crucial T500 M.2 NVMe',price:162400},
+    {id:'p677',section:'128GB~512GB M.2 NVMe (SSD)',model:'[GIGABYTE] (500GB) Gen4 4000E M.2 NVMe',price:164700},
+    {id:'p678',section:'128GB~512GB M.2 NVMe (SSD)',model:'[ESSENCORE] (500GB) KLEVV CRAS C910 M.2 NVMe',price:178200},
+    {id:'p679',section:'128GB~512GB M.2 NVMe (SSD)',model:'[삼성전자] (512GB) PM9A1 M.2 NVMe 병행수입',price:275000},
+    {id:'p680',section:'128GB~512GB M.2 NVMe (SSD)',model:'[삼성전자] (512GB) PM9E1 M.2 NVMe 병행수입',price:344100},
+    {id:'p681',section:'1TB M.2 NVMe (SSD)',model:'[PATRIOT] (1TB) P300 M.2 NVMe',price:217400},
+    {id:'p682',section:'1TB M.2 NVMe (SSD)',model:'[PATRIOT] (1TB) P400 Lite M.2 NVMe',price:224700},
+    {id:'p683',section:'1TB M.2 NVMe (SSD)',model:'[Apacer] (1TB) AS2280P4X M.2 NVMe',price:226500},
+    {id:'p684',section:'1TB M.2 NVMe (SSD)',model:'[ADATA] (1TB) LEGEND 860 M.2 NVMe',price:247800},
+    {id:'p685',section:'1TB M.2 NVMe (SSD)',model:'[마이크론] (1TB) Crucial P310 M.2 NVMe',price:272600},
+    {id:'p686',section:'1TB M.2 NVMe (SSD)',model:'[ESSENCORE] (1TB) KLEVV CRAS C715 M.2 NVMe',price:279700},
+    {id:'p687',section:'1TB M.2 NVMe (SSD)',model:'[AGI] (1TB) AI818 M.2 NVMe',price:284200},
+    {id:'p688',section:'1TB M.2 NVMe (SSD)',model:'[키오시아] (1TB) EXCERIA BASIC M.2 NVMe',price:318000},
+    {id:'p689',section:'1TB M.2 NVMe (SSD)',model:'[삼성전자] (1TB) 990 EVO Plus M.2 NVMe Hit',price:343200},
+    {id:'p690',section:'1TB M.2 NVMe (SSD)',model:'[마이크론] (1TB) Crucial T500 M.2 NVMe',price:347400},
+    {id:'p691',section:'1TB M.2 NVMe (SSD)',model:'[Western Digital] (1TB) WD BLACK SN850X M.2 NVMe',price:357600},
+    {id:'p692',section:'1TB M.2 NVMe (SSD)',model:'[키오시아] (1TB) EXCERIA PLUS G4 M.2 NVMe',price:359700},
+    {id:'p693',section:'1TB M.2 NVMe (SSD)',model:'[삼성전자] (1TB) PM9A1 M.2 NVMe 병행수입',price:420200},
+    {id:'p694',section:'1TB M.2 NVMe (SSD)',model:'[SK 하이닉스] (1TB) Platinum P41 M.2 NVMe',price:438000},
+    {id:'p695',section:'1TB M.2 NVMe (SSD)',model:'[삼성전자] (1TB) PM9E1 M.2 NVMe 병행수입',price:458700},
+    {id:'p696',section:'1TB M.2 NVMe (SSD)',model:'[삼성전자] (1TB) 990 PRO M.2 NVMe',price:473200},
+    {id:'p697',section:'1TB M.2 NVMe (SSD)',model:'[삼성전자] (1TB) 9100 PRO M.2 NVMe',price:492400},
+    {id:'p698',section:'1TB M.2 NVMe (SSD)',model:'[Seagate] (1TB) 파이어쿠다 X1070 M.2 NVMe',price:499000},
+    {id:'p699',section:'1TB M.2 NVMe (SSD)',model:'[SK 하이닉스] (1TB) Platinum P51 M.2 NVMe',price:619000},
+    {id:'p700',section:'2TB 이상 M.2 NVMe (SSD)',model:'[GIGABYTE] (2TB) Gen3 2500E M.2 NVMe',price:347000},
+    {id:'p701',section:'2TB 이상 M.2 NVMe (SSD)',model:'[마이크론] (2TB) Crucial E100 M.2 NVMe',price:425100},
+    {id:'p702',section:'2TB 이상 M.2 NVMe (SSD)',model:'[PATRIOT] (2TB) P400 Lite M.2 NVMe',price:519800},
+    {id:'p703',section:'2TB 이상 M.2 NVMe (SSD)',model:'[키오시아] (2TB) EXCERIA BASIC M.2 NVMe',price:525300},
+    {id:'p704',section:'2TB 이상 M.2 NVMe (SSD)',model:'[Western Digital] (2TB) WD BLACK SN850X M.2 NVMe',price:547400},
+    {id:'p705',section:'2TB 이상 M.2 NVMe (SSD)',model:'[Seagate] (2TB) 파이어쿠다 530R M.2 NVMe',price:599000},
+    {id:'p706',section:'2TB 이상 M.2 NVMe (SSD)',model:'[ADATA] (2TB) LEGEND 860 M.2 NVMe',price:626100},
+    {id:'p707',section:'2TB 이상 M.2 NVMe (SSD)',model:'[삼성전자] (2TB) 990 PRO M.2 NVMe',price:629400},
+    {id:'p708',section:'2TB 이상 M.2 NVMe (SSD)',model:'[SK 하이닉스] (2TB) Platinum P41 M.2 NVMe',price:639000},
+    {id:'p709',section:'2TB 이상 M.2 NVMe (SSD)',model:'[Seagate] (2TB) 파이어쿠다 540 M.2 NVMe',price:699000},
+    {id:'p710',section:'2TB 이상 M.2 NVMe (SSD)',model:'[삼성전자] (2TB) 990 EVO Plus M.2 NVMe',price:774700},
+    {id:'p711',section:'2TB 이상 M.2 NVMe (SSD)',model:'[SK 하이닉스] (2TB) Platinum P51 M.2 NVMe',price:898000},
+    {id:'p712',section:'2TB 이상 M.2 NVMe (SSD)',model:'[Seagate] (2TB) 파이어쿠다 X1070 M.2 NVMe',price:945000},
+    {id:'p713',section:'2TB 이상 M.2 NVMe (SSD)',model:'[ESSENCORE] (4TB) KLEVV CRAS C910 M.2 NVMe',price:983200},
+    {id:'p714',section:'2TB 이상 M.2 NVMe (SSD)',model:'[삼성전자] (2TB) 9100 PRO M.2 NVMe',price:1093000},
+    {id:'p715',section:'2TB 이상 M.2 NVMe (SSD)',model:'[삼성전자] (4TB) 990 EVO Plus M.2 NVMe',price:1566400},
+    {id:'p716',section:'2TB 이상 M.2 NVMe (SSD)',model:'[삼성전자] (4TB) 990 PRO M.2 NVMe',price:1709600},
+    {id:'p717',section:'2TB 이상 M.2 NVMe (SSD)',model:'[Seagate] (4TB) 파이어쿠다 X1070 M.2 NVMe',price:1899000},
+    {id:'p718',section:'2TB 이상 M.2 NVMe (SSD)',model:'[삼성전자] (4TB) 9100 PRO M.2 NVMe',price:2181000},
+    {id:'p719',section:'2TB 이상 M.2 NVMe (SSD)',model:'[삼성전자] (4TB) 9100 PRO M.2 NVMe x 4EA',price:8724000},
+    {id:'p720',section:'2.5인치 S-ATA (SSD)',model:'[팀그룹] (1TB) GX2 (2.5" SSD)',price:219000},
+    {id:'p721',section:'2.5인치 S-ATA (SSD)',model:'[삼성전자] (500GB) 870 EVO',price:312300},
+    {id:'p722',section:'2.5인치 S-ATA (SSD)',model:'[삼성전자] (1TB) 870 EVO',price:805500},
+    {id:'p723',section:'2.5인치 S-ATA (SSD)',model:'[Seagate] (3.84TB) NYTRO 1361 (2.5" SSD)',price:2450000},
+  ]},
+  HDD_SSD_D:{label:'HDD·SSD (D드라이브)',color:'#475569',bg:'#f1f5f9',items:[
+    {id:'p724',section:'2.5" SSD [S-ATA]',model:'[BIWIN] (512GB) M100 [SSD 2.5"]',price:126100},
+    {id:'p725',section:'2.5" SSD [S-ATA]',model:'[키오시아] (480GB) EXCERIA',price:139600},
+    {id:'p726',section:'2.5" SSD [S-ATA]',model:'[마이크론] (500GB) Crucial BX500',price:181000},
+    {id:'p727',section:'2.5" SSD [S-ATA]',model:'[팀그룹] (1TB) GX2 (2.5" SSD)',price:219000},
+    {id:'p728',section:'2.5" SSD [S-ATA]',model:'[BIWIN] (1TB) M100 [SSD 2.5"]',price:227000},
+    {id:'p729',section:'2.5" SSD [S-ATA]',model:'[삼성전자] (500GB) 870 EVO',price:312300},
+    {id:'p730',section:'2.5" SSD [S-ATA]',model:'[삼성전자] (1TB) 870 EVO',price:805500},
+    {id:'p731',section:'2.5" SSD [S-ATA]',model:'[Seagate] (3.84TB) NYTRO 1361 (2.5" SSD)',price:2450000},
+    {id:'p732',section:'128GB~512GB M.2 NVMe (SSD)',model:'[COLORFUL] (512GB) CN600 M.2 NVMe',price:137400},
+    {id:'p733',section:'128GB~512GB M.2 NVMe (SSD)',model:'[GIGABYTE] (512GB) Gen3 M.2 NVMe',price:147800},
+    {id:'p734',section:'128GB~512GB M.2 NVMe (SSD)',model:'[GIGABYTE] (500GB) Gen3 2500E M.2 NVMe',price:148700},
+    {id:'p735',section:'128GB~512GB M.2 NVMe (SSD)',model:'[PATRIOT] (512GB) P300 M.2 NVMe',price:152600},
+    {id:'p736',section:'128GB~512GB M.2 NVMe (SSD)',model:'[TeamGroup] (512GB) MP33 M.2 NVMe',price:153900},
+    {id:'p737',section:'128GB~512GB M.2 NVMe (SSD)',model:'[ESSENCORE] (512GB) KLEVV CRAS C715 M.2 NVMe',price:157800},
+    {id:'p738',section:'128GB~512GB M.2 NVMe (SSD)',model:'[ADATA] (512GB) XPG SX8200 Pro M.2 NVMe',price:160200},
+    {id:'p739',section:'128GB~512GB M.2 NVMe (SSD)',model:'[마이크론] (500GB) Crucial T500 M.2 NVMe',price:162400},
+    {id:'p740',section:'128GB~512GB M.2 NVMe (SSD)',model:'[GIGABYTE] (500GB) Gen4 4000E M.2 NVMe',price:164700},
+    {id:'p741',section:'128GB~512GB M.2 NVMe (SSD)',model:'[ESSENCORE] (500GB) KLEVV CRAS C910 M.2 NVMe',price:178200},
+    {id:'p742',section:'128GB~512GB M.2 NVMe (SSD)',model:'[삼성전자] (512GB) PM9A1 M.2 NVMe 병행수입',price:275000},
+    {id:'p743',section:'128GB~512GB M.2 NVMe (SSD)',model:'[삼성전자] (512GB) PM9E1 M.2 NVMe 병행수입',price:344100},
+    {id:'p744',section:'1TB M.2 NVMe (SSD)',model:'[PATRIOT] (1TB) P400 Lite M.2 NVMe',price:224700},
+    {id:'p745',section:'1TB M.2 NVMe (SSD)',model:'[Apacer] (1TB) AS2280P4X M.2 NVMe',price:226500},
+    {id:'p746',section:'1TB M.2 NVMe (SSD)',model:'[ADATA] (1TB) LEGEND 860 M.2 NVMe',price:247800},
+    {id:'p747',section:'1TB M.2 NVMe (SSD)',model:'[마이크론] (1TB) Crucial P310 M.2 NVMe',price:272600},
+    {id:'p748',section:'1TB M.2 NVMe (SSD)',model:'[ESSENCORE] (1TB) KLEVV CRAS C715 M.2 NVMe',price:279700},
+    {id:'p749',section:'1TB M.2 NVMe (SSD)',model:'[키오시아] (1TB) EXCERIA BASIC M.2 NVMe',price:318000},
+    {id:'p750',section:'1TB M.2 NVMe (SSD)',model:'[삼성전자] (1TB) 990 EVO Plus M.2 NVMe Hit',price:343200},
+    {id:'p751',section:'1TB M.2 NVMe (SSD)',model:'[마이크론] (1TB) Crucial T500 M.2 NVMe',price:347400},
+    {id:'p752',section:'1TB M.2 NVMe (SSD)',model:'[Western Digital] (1TB) WD BLACK SN850X M.2 NVMe',price:357600},
+    {id:'p753',section:'1TB M.2 NVMe (SSD)',model:'[키오시아] (1TB) EXCERIA PLUS G4 M.2 NVMe',price:359700},
+    {id:'p754',section:'1TB M.2 NVMe (SSD)',model:'[삼성전자] (1TB) PM9A1 M.2 NVMe 병행수입',price:420200},
+    {id:'p755',section:'1TB M.2 NVMe (SSD)',model:'[삼성전자] (1TB) PM9E1 M.2 NVMe 병행수입',price:458700},
+    {id:'p756',section:'1TB M.2 NVMe (SSD)',model:'[삼성전자] (1TB) 990 PRO M.2 NVMe',price:473200},
+    {id:'p757',section:'1TB M.2 NVMe (SSD)',model:'[삼성전자] (1TB) 9100 PRO M.2 NVMe',price:492400},
+    {id:'p758',section:'1TB M.2 NVMe (SSD)',model:'[Seagate] (1TB) 파이어쿠다 X1070 M.2 NVMe',price:499000},
+    {id:'p759',section:'1TB M.2 NVMe (SSD)',model:'[SK 하이닉스] (1TB) Platinum P51 M.2 NVMe',price:619000},
+    {id:'p760',section:'2TB 이상 M.2 NVMe (SSD)',model:'[GIGABYTE] (2TB) Gen3 2500E M.2 NVMe',price:347000},
+    {id:'p761',section:'2TB 이상 M.2 NVMe (SSD)',model:'[마이크론] (2TB) Crucial E100 M.2 NVMe',price:425100},
+    {id:'p762',section:'2TB 이상 M.2 NVMe (SSD)',model:'[PATRIOT] (2TB) P400 Lite M.2 NVMe',price:519800},
+    {id:'p763',section:'2TB 이상 M.2 NVMe (SSD)',model:'[키오시아] (2TB) EXCERIA BASIC M.2 NVMe',price:525300},
+    {id:'p764',section:'2TB 이상 M.2 NVMe (SSD)',model:'[Western Digital] (2TB) WD BLACK SN850X M.2 NVMe',price:547400},
+    {id:'p765',section:'2TB 이상 M.2 NVMe (SSD)',model:'[Seagate] (2TB) 파이어쿠다 530R M.2 NVMe',price:599000},
+    {id:'p766',section:'2TB 이상 M.2 NVMe (SSD)',model:'[ADATA] (2TB) LEGEND 860 M.2 NVMe',price:626100},
+    {id:'p767',section:'2TB 이상 M.2 NVMe (SSD)',model:'[삼성전자] (2TB) 990 PRO M.2 NVMe',price:629400},
+    {id:'p768',section:'2TB 이상 M.2 NVMe (SSD)',model:'[Seagate] (2TB) 파이어쿠다 540 M.2 NVMe',price:699000},
+    {id:'p769',section:'2TB 이상 M.2 NVMe (SSD)',model:'[삼성전자] (2TB) 990 EVO Plus M.2 NVMe',price:774700},
+    {id:'p770',section:'2TB 이상 M.2 NVMe (SSD)',model:'[PATRIOT] (4TB) P400 Lite M.2 NVMe',price:803000},
+    {id:'p771',section:'2TB 이상 M.2 NVMe (SSD)',model:'[SK 하이닉스] (2TB) Platinum P51 M.2 NVMe',price:898000},
+    {id:'p772',section:'2TB 이상 M.2 NVMe (SSD)',model:'[Seagate] (2TB) 파이어쿠다 X1070 M.2 NVMe',price:945000},
+    {id:'p773',section:'2TB 이상 M.2 NVMe (SSD)',model:'[ESSENCORE] (4TB) KLEVV CRAS C910 M.2 NVMe',price:983200},
+    {id:'p774',section:'2TB 이상 M.2 NVMe (SSD)',model:'[삼성전자] (2TB) 9100 PRO M.2 NVMe',price:1093000},
+    {id:'p775',section:'2TB 이상 M.2 NVMe (SSD)',model:'[Western Digital] (4TB) WD BLACK SN850X M.2 NVMe',price:1094800},
+    {id:'p776',section:'2TB 이상 M.2 NVMe (SSD)',model:'[삼성전자] (4TB) 990 EVO Plus M.2 NVMe',price:1566400},
+    {id:'p777',section:'2TB 이상 M.2 NVMe (SSD)',model:'[삼성전자] (4TB) 990 PRO M.2 NVMe',price:1709600},
+    {id:'p778',section:'2TB 이상 M.2 NVMe (SSD)',model:'[Seagate] (4TB) 파이어쿠다 X1070 M.2 NVMe',price:1899000},
+    {id:'p779',section:'2TB 이상 M.2 NVMe (SSD)',model:'[삼성전자] (4TB) 9100 PRO M.2 NVMe',price:2181000},
+    {id:'p780',section:'3.5" HDD [S-ATA]',model:'[Western Digital] WD (1TB) BLUE 5400/64M',price:168000},
+    {id:'p781',section:'3.5" HDD [S-ATA]',model:'[Western Digital] WD (2TB) BLUE 5400/64M',price:188000},
+    {id:'p782',section:'3.5" HDD [S-ATA]',model:'[도시바] (2TB) P300 7200/256M [HDWD320]',price:189000},
+    {id:'p783',section:'3.5" HDD [S-ATA]',model:'[Western Digital] WD (4TB) BLUE 5400/256M',price:229000},
+    {id:'p784',section:'3.5" HDD [S-ATA]',model:'[도시바] (4TB) P300 5400/128M',price:229000},
+    {id:'p785',section:'3.5" HDD [S-ATA]',model:'[도시바] (6TB) P300 5400/128M',price:349000},
+    {id:'p786',section:'3.5" HDD [S-ATA]',model:'[도시바] (6TB) X300 Refresh 7200/512M',price:395000},
+    {id:'p787',section:'3.5" HDD [S-ATA]',model:'[Seagate] (8TB) BarraCuda 5400/256M',price:429000},
+    {id:'p788',section:'3.5" HDD [S-ATA]',model:'[Western Digital] WD (8TB) BLUE 5640/128M',price:449000},
+    {id:'p789',section:'3.5" HDD [S-ATA]',model:'[Seagate] (16TB) BarraCuda 5400/512M',price:859000},
+    {id:'p790',section:'3.5" HDD [S-ATA]',model:'[Seagate] (20TB) BarraCuda 7200/512M',price:969000},
+    {id:'p791',section:'NAS/CCTV용 [S-ATA HDD]',model:'[Western Digital] WD (2TB) RED Plus 5400/128M',price:201200},
+    {id:'p792',section:'NAS/CCTV용 [S-ATA HDD]',model:'[Western Digital] WD (4TB) RED Plus 5400/128M',price:249000},
+    {id:'p793',section:'NAS/CCTV용 [S-ATA HDD]',model:'[Seagate] (4TB) IronWolf 5400/256M',price:269000},
+    {id:'p794',section:'NAS/CCTV용 [S-ATA HDD]',model:'[Western Digital] WD (4TB) RED Pro 7200/256M',price:359000},
+    {id:'p795',section:'NAS/CCTV용 [S-ATA HDD]',model:'[Seagate] (6TB) IronWolf 5400/256M',price:389000},
+    {id:'p796',section:'NAS/CCTV용 [S-ATA HDD]',model:'[Western Digital] WD (6TB) RED Pro 7200/256M',price:469000},
+    {id:'p797',section:'NAS/CCTV용 [S-ATA HDD]',model:'[Seagate] (8TB) IronWolf 7200/256M',price:499000},
+    {id:'p798',section:'NAS/CCTV용 [S-ATA HDD]',model:'[Seagate] (8TB) IronWolf Pro 7200/256M',price:579000},
+    {id:'p799',section:'NAS/CCTV용 [S-ATA HDD]',model:'[Seagate] (10TB) IronWolf 7200/256M',price:629000},
+    {id:'p800',section:'NAS/CCTV용 [S-ATA HDD]',model:'[Seagate] (10TB) IronWolf Pro 7200/256M',price:719000},
+    {id:'p801',section:'NAS/CCTV용 [S-ATA HDD]',model:'[Seagate] (12TB) IronWolf 7200/256M',price:749000},
+    {id:'p802',section:'NAS/CCTV용 [S-ATA HDD]',model:'[Seagate] (12TB) IronWolf Pro 7200/256M',price:849000},
+    {id:'p803',section:'NAS/CCTV용 [S-ATA HDD]',model:'[Seagate] (16TB) IronWolf Pro 7200/256M',price:1149000},
+    {id:'p804',section:'NAS/CCTV용 [S-ATA HDD]',model:'[Seagate] (20TB) IronWolf Pro 7200/256M',price:1399000},
+    {id:'p805',section:'NAS/CCTV용 [S-ATA HDD]',model:'[Seagate] (24TB) IronWolf Pro 7200/512M',price:1699000},
+    {id:'p806',section:'NAS/CCTV용 [S-ATA HDD]',model:'[Seagate] (28TB) IronWolf Pro 7200/512M',price:1899000},
+    {id:'p807',section:'NAS/CCTV용 [S-ATA HDD]',model:'[Seagate] (30TB) IronWolf Pro 7200/512M',price:2099000},
+  ]},
+  POWER:{label:'파워',color:'#475569',bg:'#f1f5f9',items:[
+    {id:'p808',section:'500~600W ATX 미들형 기본파워',model:'[HOPELY] 500RW V2.3',price:31500},
+    {id:'p809',section:'500~600W ATX 미들형 기본파워',model:'[PNC파트너] EVEREST 600P Platinum',price:32000},
+    {id:'p810',section:'500~600W ATX 미들형 기본파워',model:'[몬스타] 가츠 PrimeX X500W 83 FLAT',price:32000},
+    {id:'p811',section:'500~600W ATX 미들형 기본파워',model:'[몬스타] 가츠 PrimeX X600W 83 FLAT',price:34000},
+    {id:'p812',section:'500~600W ATX 미들형 기본파워',model:'[HOPELY] K600',price:36000},
+    {id:'p813',section:'500~600W ATX 미들형 기본파워',model:'[PNC파트너] EVEREST 600W PLUS',price:37200},
+    {id:'p814',section:'500~600W ATX 미들형 기본파워',model:'[MSI] MAG A500N-H',price:37500},
+    {id:'p815',section:'500~600W ATX 미들형 기본파워',model:'[AONE] STORM 600LF 83+ 싱글레일',price:38400},
+    {id:'p816',section:'500~600W ATX 미들형 기본파워',model:'[잘만] EcoMax 500W',price:39500},
+    {id:'p817',section:'500~600W ATX 미들형 기본파워',model:'[마이크로닉스] COOLMAX ELITE II 500W',price:40300},
+    {id:'p818',section:'500~600W ATX 미들형 기본파워',model:'[몬스타] 가츠 ExtremeX FX600 80PLUS STANDARD',price:41000},
+    {id:'p819',section:'500~600W ATX 미들형 기본파워',model:'[마이크로닉스] COOLMAX VISION II 500W',price:44900},
+    {id:'p820',section:'500~600W ATX 미들형 기본파워',model:'[마이크로닉스] COOLMAX ELITE II 600W',price:46400},
+    {id:'p821',section:'500~600W ATX 미들형 기본파워',model:'[잘만] EcoMax 600W',price:47400},
+    {id:'p822',section:'500~600W ATX 미들형 기본파워',model:'[마이크로닉스] COOLMAX FOCUS II 500W ETA BRONZE',price:48700},
+    {id:'p823',section:'500~600W ATX 미들형 기본파워',model:'[MSI] MAG A600DN 80PLUS 스탠다드',price:48700},
+    {id:'p824',section:'500~600W ATX 미들형 기본파워',model:'[SilverStone] Essential ST60F-ES230 600W 80PLUS 스탠다드',price:49200},
+    {id:'p825',section:'500~600W ATX 미들형 기본파워',model:'[맥스엘리트] MAXWELL RENAS 600W 80PLUS스탠다드',price:49500},
+    {id:'p826',section:'500~600W ATX 미들형 기본파워',model:'[마이크로닉스] COOLMAX VISION II 600W',price:51600},
+    {id:'p827',section:'500~600W ATX 미들형 기본파워',model:'[잘만] MegaMax 600W 80+ STANDARD',price:55000},
+    {id:'p828',section:'500~600W ATX 미들형 기본파워',model:'[마이크로닉스] COOLMAX FOCUS II 600W ETA BRONZE',price:55900},
+    {id:'p829',section:'500~600W ATX 미들형 기본파워',model:'[FSP] HYPER 600W 80PLUS스탠다드 230V EU ATX3.1',price:56000},
+    {id:'p830',section:'500~600W ATX 미들형 기본파워',model:'[마이크로닉스] Classic II 풀체인지 500W 80PLUS BRONZE ATX3.1',price:58200},
+    {id:'p831',section:'500~600W ATX 미들형 기본파워',model:'[마이크로닉스] Classic II 풀체인지 550W 80PLUS스탠다드 ATX3.1',price:58300},
+    {id:'p832',section:'500~600W ATX 미들형 기본파워',model:'[마이크로닉스] Classic II 풀체인지 600W 80PLUS BRONZE ATX3.1',price:65900},
+    {id:'p833',section:'500~600W ATX 미들형 기본파워',model:'[마이크로닉스] Classic II 풀체인지 600W 80PLUS브론즈 ATX3.1 화이트',price:71200},
+    {id:'p834',section:'650~750W ATX 미들형 기본파워',model:'[몬스타] 가츠 ExtremeX FX700 80PLUS스탠다드',price:44000},
+    {id:'p835',section:'650~750W ATX 미들형 기본파워',model:'[앱코] 코어맥스 CM-700B ETA브론즈',price:44000},
+    {id:'p836',section:'650~750W ATX 미들형 기본파워',model:'[아툼] POWERCRASH 700W 80PLUS브론즈 ATX3.1',price:45000},
+    {id:'p837',section:'650~750W ATX 미들형 기본파워',model:'[몬스타] 가츠 ExtremeX FX700 80PLUS스탠다드 화이트',price:47000},
+    {id:'p838',section:'650~750W ATX 미들형 기본파워',model:'[AONE] STORM 700LF 83+',price:49000},
+    {id:'p839',section:'650~750W ATX 미들형 기본파워',model:'[잘만] EcoMax 700W',price:50800},
+    {id:'p840',section:'650~750W ATX 미들형 기본파워',model:'[NZXT] C650 80PLUS골드',price:54500},
+    {id:'p841',section:'650~750W ATX 미들형 기본파워',model:'[PNC파트너] EVEREST 750W 80+ STANDARD',price:57000},
+    {id:'p842',section:'650~750W ATX 미들형 기본파워',model:'[맥스엘리트] STARS GEMINI 650W 80PLUS브론즈 ATX3.1',price:59000},
+    {id:'p843',section:'650~750W ATX 미들형 기본파워',model:'[맥스엘리트] STARS GEMINI 650W 80PLUS브론즈 ATX3.1 화이트',price:59000},
+    {id:'p844',section:'650~750W ATX 미들형 기본파워',model:'[맥스엘리트] MAXWELL RENAS 700W 80PLUS스탠다드',price:59000},
+    {id:'p845',section:'650~750W ATX 미들형 기본파워',model:'[앱코] SETTLER 하이브리드 PCIE5.1 STH-700B ETA BRONZE 블랙',price:62700},
+    {id:'p846',section:'650~750W ATX 미들형 기본파워',model:'[잘만] MegaMax 700W 80+ STANDARD',price:64500},
+    {id:'p847',section:'650~750W ATX 미들형 기본파워',model:'[쿨러마스터] MWE 브론즈 650 V3 230V ATX3.1',price:65000},
+    {id:'p848',section:'650~750W ATX 미들형 기본파워',model:'[마이크로닉스] Classic II 풀체인지 650W 80PLUS스탠다드 ATX3.1',price:65900},
+    {id:'p849',section:'650~750W ATX 미들형 기본파워',model:'[앱코] SETTLER 하이브리드 PCIE5.1 STH-700B ETA BRONZE 화이트',price:67900},
+    {id:'p850',section:'650~750W ATX 미들형 기본파워',model:'[쿨러마스터] MWE 브론즈 650 V3 230V ATX3.1 화이트',price:68000},
+    {id:'p851',section:'650~750W ATX 미들형 기본파워',model:'[맥스엘리트] STARS GEMINI 750W 80PLUS브론즈 ATX3.1',price:69000},
+    {id:'p852',section:'650~750W ATX 미들형 기본파워',model:'[맥스엘리트] STARS GEMINI 750W 80PLUS브론즈 ATX3.1 화이트',price:69000},
+    {id:'p853',section:'650~750W ATX 미들형 기본파워',model:'[마이크로닉스] COOLMAX FOCUS II 700W ETA브론즈 ATX3.1',price:70500},
+    {id:'p854',section:'650~750W ATX 미들형 기본파워',model:'[FSP] HYPER 700W 80PLUS스탠다드 230V EU ATX3.1',price:70500},
+    {id:'p855',section:'650~750W ATX 미들형 기본파워',model:'[3RSYS] AK 750W 80PLUS브론즈 모듈러 ATX3.1',price:75000},
+    {id:'p856',section:'650~750W ATX 미들형 기본파워',model:'[잘만] MegaMax II 700W 80PLUS브론즈 ATX3.1',price:75500},
+    {id:'p857',section:'650~750W ATX 미들형 기본파워',model:'[ASUS] PRIME 750W Bronze',price:81700},
+    {id:'p858',section:'650~750W ATX 미들형 기본파워',model:'[잘만] GigaMax III 750W 80PLUS브론즈 모듈러 ATX3.1',price:83200},
+    {id:'p859',section:'650~750W ATX 미들형 기본파워',model:'[MSI] MAG A750BN III 80PLUS브론즈 ATX3.1',price:84000},
+    {id:'p860',section:'650~750W ATX 미들형 기본파워',model:'[쿨러마스터] MWE 브론즈 750 V3 230V ATX3.1',price:84600},
+    {id:'p861',section:'650~750W ATX 미들형 기본파워',model:'[마이크로닉스] Classic II 풀체인지 700W 80PLUS BRONZE ATX3.1',price:87900},
+    {id:'p862',section:'650~750W ATX 미들형 기본파워',model:'[마이크로닉스] Classic II 풀체인지 750W 80PLUS스탠다드 ATX3.1',price:87900},
+    {id:'p863',section:'650~750W ATX 미들형 기본파워',model:'[쿨러마스터] MWE 브론즈 750 V3 230V ATX3.1 화이트',price:88000},
+    {id:'p864',section:'650~750W ATX 미들형 기본파워',model:'[쿨러마스터] MWE GOLD 750 V3 ATX3.1',price:89700},
+    {id:'p865',section:'650~750W ATX 미들형 기본파워',model:'[마이크로닉스] Classic II 풀체인지 700W 80+ BRONZE 화이트 ATX 3.1 (PCIE5.1)',price:92900},
+    {id:'p866',section:'650~750W ATX 미들형 기본파워',model:'[쿨러마스터] MWE GOLD 750 V3 ATX3.1 화이트',price:95800},
+    {id:'p867',section:'650~750W ATX 미들형 기본파워',model:'[마이크로닉스] WIZMAX 750W 80PLUS실버 ATX3.1',price:96800},
+    {id:'p868',section:'650~750W ATX 미들형 기본파워',model:'[FSP] VIC GM 750W 80PLUS골드 풀모듈러 ATX 3.1',price:118800},
+    {id:'p869',section:'650~750W ATX 미들형 기본파워',model:'[MSI] MAG A750GL 80PLUS 골드 풀 모듈러 ATX 3.1 (PCIE5)',price:120900},
+    {id:'p870',section:'650~750W ATX 미들형 기본파워',model:'[Antec] GSK 750W V2 80PLUS골드 풀모듈러 ATX3.1',price:124000},
+    {id:'p871',section:'650~750W ATX 미들형 기본파워',model:'[마이크로닉스] Classic II 750W 80PLUS골드 풀모듈러 ATX3.1',price:129900},
+    {id:'p872',section:'650~750W ATX 미들형 기본파워',model:'[쿨러마스터] GX II Gold 750 ATX 3.0',price:132300},
+    {id:'p873',section:'650~750W ATX 미들형 기본파워',model:'[마이크로닉스] Classic II 750W 80PLUS골드 풀모듈러 ATX3.1 화이트',price:140200},
+    {id:'p874',section:'650~750W ATX 미들형 기본파워',model:'[시소닉] NEW FOCUS V4 GX-750 GOLD 풀모듈러 ATX3.1',price:189000},
+    {id:'p875',section:'800~900W ATX 미들형 기본파워',model:'[몬스타] 가츠 ExtremeX FX800 80PLUS STANDARD',price:51000},
+    {id:'p876',section:'800~900W ATX 미들형 기본파워',model:'[몬스타] 가츠 ExtremeX FX800 80PLUS STANDARD 화이트',price:55000},
+    {id:'p877',section:'800~900W ATX 미들형 기본파워',model:'[쎈루트] PN800W 80PLUS BRONZE ATX3.0',price:57000},
+    {id:'p878',section:'800~900W ATX 미들형 기본파워',model:'[아툼] POWERCRASH 800W 80PLUS브론즈 ATX3.1',price:57000},
+    {id:'p879',section:'800~900W ATX 미들형 기본파워',model:'[몬스타] 가츠 MASTERX X850W 80PLUS브론즈 ATX3.1 블랙',price:65100},
+    {id:'p880',section:'800~900W ATX 미들형 기본파워',model:'[AONE] STORM 800W 80+ BRONZE',price:66000},
+    {id:'p881',section:'800~900W ATX 미들형 기본파워',model:'[몬스타] 가츠 MASTERX X850W 80PLUS브론즈 ATX3.1 화이트',price:67200},
+    {id:'p882',section:'800~900W ATX 미들형 기본파워',model:'[앱코] SETTLER 하이브리드 PCIE5.1 STH-800B ETA BRONZE 블랙',price:71900},
+    {id:'p883',section:'800~900W ATX 미들형 기본파워',model:'[잘만] MegaMax 800W 80+ STANDARD',price:72000},
+    {id:'p884',section:'800~900W ATX 미들형 기본파워',model:'[앱코] SETTLER 하이브리드 PCIE5.1 STH-800B ETA BRONZE 화이트',price:78100},
+    {id:'p885',section:'800~900W ATX 미들형 기본파워',model:'[마이크로닉스] COOLMAX FOCUS II 800W ETA실버 ATX3.1',price:80000},
+    {id:'p886',section:'800~900W ATX 미들형 기본파워',model:'[AONE] 시그니처 850W 80PLUS브론즈 풀모듈러 ATX3.1',price:85000},
+    {id:'p887',section:'800~900W ATX 미들형 기본파워',model:'[3RSYS] AK 850W 80PLUS브론즈 모듈러 ATX3.1',price:85000},
+    {id:'p888',section:'800~900W ATX 미들형 기본파워',model:'[쎈루트] TX850 80+ GOLD 풀모듈러',price:89100},
+    {id:'p889',section:'800~900W ATX 미들형 기본파워',model:'[잘만] GigaMax III 850W 80Plus Bronze 모듈러 ATX3.1',price:95300},
+    {id:'p890',section:'800~900W ATX 미들형 기본파워',model:'[마이크로닉스] Classic II 풀체인지 800W 80PLUS BRONZE ATX3.1',price:98500},
+    {id:'p891',section:'800~900W ATX 미들형 기본파워',model:'[쿨러마스터] MWE GOLD 850 V3 ATX3.1 블랙',price:98700},
+    {id:'p892',section:'800~900W ATX 미들형 기본파워',model:'[마이크로닉스] COOLMAX FOCUS II 900W ETA SILVER PCIE5',price:99000},
+    {id:'p893',section:'800~900W ATX 미들형 기본파워',model:'[쿨러마스터] MWE GOLD 850 V3 ATX3.1 화이트',price:99400},
+    {id:'p894',section:'800~900W ATX 미들형 기본파워',model:'[마이크로닉스] Classic II 풀체인지 800W 80PLUS실버 ATX3.1 (화이트)',price:104700},
+    {id:'p895',section:'800~900W ATX 미들형 기본파워',model:'[몬스타] 가츠 MASTERX X850W 80PLUS골드 블랙',price:109500},
+    {id:'p896',section:'800~900W ATX 미들형 기본파워',model:'[GIGABYTE] UD850GM PG5 V2 80PLUS골드 풀모듈러 ATX3.1',price:110600},
+    {id:'p897',section:'800~900W ATX 미들형 기본파워',model:'[앱코] ULTIMATE GX850 80PLUS골드 풀모듈러 ATX3.0 화이트',price:111000},
+    {id:'p898',section:'800~900W ATX 미들형 기본파워',model:'[마이크로닉스] Classic II 풀체인지 900W 80PLUS실버 ATX3.1',price:114200},
+    {id:'p899',section:'800~900W ATX 미들형 기본파워',model:'[Segotep] GM850W 80PLUS골드 풀모듈러 ATX3.1 블랙',price:115000},
+    {id:'p900',section:'800~900W ATX 미들형 기본파워',model:'[마이크로닉스] WIZMAX 850W 80PLUS실버 ATX3.1',price:117600},
+    {id:'p901',section:'800~900W ATX 미들형 기본파워',model:'[darkFlash] 퍼펙트모스트 850W 80PLUS골드 풀모듈러 ATX3.1 블랙',price:119200},
+    {id:'p902',section:'800~900W ATX 미들형 기본파워',model:'[darkFlash] 퍼펙트모스트 850W 80PLUS골드 풀모듈러 ATX3.1 화이트',price:125400},
+    {id:'p903',section:'800~900W ATX 미들형 기본파워',model:'[Segotep] GM850W 80PLUS골드 풀모듈러 ATX3.1 화이트',price:130000},
+    {id:'p904',section:'800~900W ATX 미들형 기본파워',model:'[FSP] VIC GM 850W 80PLUS골드 풀모듈러 ATX 3.1',price:138900},
+    {id:'p905',section:'800~900W ATX 미들형 기본파워',model:'[쿨러마스터] GX II Gold 850 ATX 3.0',price:143900},
+    {id:'p906',section:'800~900W ATX 미들형 기본파워',model:'[Antec] GSK 850W V2 화이트 80PLUS골드 풀모듈러 ATX3.1',price:144000},
+    {id:'p907',section:'800~900W ATX 미들형 기본파워',model:'[마이크로닉스] Classic II 850W 80PLUS골드 풀모듈러 ATX3.1',price:149900},
+    {id:'p908',section:'800~900W ATX 미들형 기본파워',model:'[마이크로닉스] Classic II 850W 80PLUS골드 풀모듈러 ATX3.1 화이트',price:159900},
+    {id:'p909',section:'800~900W ATX 미들형 기본파워',model:'[darkFlash] UPMOST 850W 80+ GOLD 풀모듈러 화이트',price:160000},
+    {id:'p910',section:'800~900W ATX 미들형 기본파워',model:'[마이크로닉스] COOLMAX P-850W 80+ PLATINUM ATX3.0',price:179900},
+    {id:'p911',section:'800~900W ATX 미들형 기본파워',model:'[쿨러마스터] GX III Gold 850 ATX 3.0',price:183000},
+    {id:'p912',section:'800~900W ATX 미들형 기본파워',model:'[SuperFlower] SF-850F14XG LEADEX VII GOLD ATX3.1',price:202800},
+    {id:'p913',section:'800~900W ATX 미들형 기본파워',model:'[SuperFlower] SF-850F14XG LEADEX VII GOLD 화이트 ATX3.1',price:212800},
+    {id:'p914',section:'800~900W ATX 미들형 기본파워',model:'[시소닉] NEW FOCUS V4 GX-850 GOLD 풀모듈러 ATX3.1',price:215000},
+    {id:'p915',section:'800~900W ATX 미들형 기본파워',model:'[마이크로닉스] ASTRO II PT 850W 80PLUS플래티넘 풀모듈러 ATX3.1',price:219900},
+    {id:'p916',section:'800~900W ATX 미들형 기본파워',model:'[시소닉] NEW FOCUS V4 GX-850 GOLD 풀모듈러 ATX3.1 화이트',price:235000},
+    {id:'p917',section:'800~900W ATX 미들형 기본파워',model:'[리안리] EDGE 850 80PLUS 플래티넘 블랙',price:238400},
+    {id:'p918',section:'800~900W ATX 미들형 기본파워',model:'[CORSAIR] RM850x SHIFT 80PLUS Gold ATX 3.0',price:254300},
+    {id:'p919',section:'1000W 이상 ATX 미들형 기본파워',model:'[앱코] SETTLER 하이브리드 PCIE5.1 STH-1000B ETA SILVER 블랙',price:94700},
+    {id:'p920',section:'1000W 이상 ATX 미들형 기본파워',model:'[AONE] 시그니처 1000W 80PLUS브론즈 풀모듈러 베이직 ATX3.1',price:95000},
+    {id:'p921',section:'1000W 이상 ATX 미들형 기본파워',model:'[3RSYS] AK 1000W 80PLUS브론즈 모듈러 ATX3.1',price:99500},
+    {id:'p922',section:'1000W 이상 ATX 미들형 기본파워',model:'[Antec] CSK PRO 1000W 80PLUS브론즈 230V EU 모듈러 ATX3.1',price:123200},
+    {id:'p923',section:'1000W 이상 ATX 미들형 기본파워',model:'[쿨러마스터] MWE Gold 1050 V2 ATX 3.0 FULL MODULAR',price:127700},
+    {id:'p924',section:'1000W 이상 ATX 미들형 기본파워',model:'[몬스타] 가츠 MASTERX X1000W 80PLUS골드 화이트',price:135000},
+    {id:'p925',section:'1000W 이상 ATX 미들형 기본파워',model:'[PNC파트너] EVEREST ECO AFTER 1100AP RGB 풀모듈러',price:154000},
+    {id:'p926',section:'1000W 이상 ATX 미들형 기본파워',model:'[Segotep] GM1000W 80PLUS골드 풀모듈러 ATX3.1 블랙',price:155000},
+    {id:'p927',section:'1000W 이상 ATX 미들형 기본파워',model:'[맥스엘리트] MAXWELL DUKE 1000W 80PLUS플래티넘 풀모듈러 ATX3.0',price:169000},
+    {id:'p928',section:'1000W 이상 ATX 미들형 기본파워',model:'[Segotep] GM1000W 80PLUS골드 풀모듈러 ATX3.1 화이트',price:170000},
+    {id:'p929',section:'1000W 이상 ATX 미들형 기본파워',model:'[잘만] TeraMax II SE 1000W 80PLUS골드 풀모듈러 ATX3.1 블랙',price:179000},
+    {id:'p930',section:'1000W 이상 ATX 미들형 기본파워',model:'[MSI] MAG A1000GLS 80PLUS골드 풀모듈러 ATX3.1',price:183600},
+    {id:'p931',section:'1000W 이상 ATX 미들형 기본파워',model:'[마이크로닉스] Classic II 1050W 80PLUS골드 풀모듈러 ATX3.1',price:189900},
+    {id:'p932',section:'1000W 이상 ATX 미들형 기본파워',model:'[darkFlash] UPMOST 1050W 80PLUS골드 풀모듈러 ATX3.0 화이트',price:192700},
+    {id:'p933',section:'1000W 이상 ATX 미들형 기본파워',model:'[마이크로닉스] Classic II 1050W 80PLUS골드 풀모듈러 ATX3.1 화이트',price:199900},
+    {id:'p934',section:'1000W 이상 ATX 미들형 기본파워',model:'[마이크로닉스] COOL MAX P-1050W 80+ PLATINUM ATX 3.0',price:226600},
+    {id:'p935',section:'1000W 이상 ATX 미들형 기본파워',model:'[슈퍼플라워] SF-1000F14XG LEADEX VII GOLD ATX 3.1 (PCIE5)',price:232800},
+    {id:'p936',section:'1000W 이상 ATX 미들형 기본파워',model:'[쿨러마스터] GX III GOLD 1050 풀모듈러 ATX3.0',price:239200},
+    {id:'p937',section:'1000W 이상 ATX 미들형 기본파워',model:'[슈퍼플라워] SF-1000F14XG LEADEX VII GOLD 화이트 ATX 3.1 (PCIE5)',price:243800},
+    {id:'p938',section:'1000W 이상 ATX 미들형 기본파워',model:'[Antec] NeoECO 1000W 화이트 80PLUS골드 풀모듈러 ATX3.0',price:249000},
+    {id:'p939',section:'1000W 이상 ATX 미들형 기본파워',model:'[CORSAIR] RMx Series RM1000x ATX3.1',price:255300},
+    {id:'p940',section:'1000W 이상 ATX 미들형 기본파워',model:'[마이크로닉스] ASTRO II PT 1000W 80PLUS플래티넘 풀모듈러 ATX3.1',price:260900},
+    {id:'p941',section:'1000W 이상 ATX 미들형 기본파워',model:'[시소닉] NEW FOCUS V4 GX-1000 GOLD ATX3.1 (블랙)',price:265000},
+    {id:'p942',section:'1000W 이상 ATX 미들형 기본파워',model:'[슈퍼플라워] SF-1000F14XP LEADEX VII PRO PLATINUM 블랙 ATX3.1',price:268500},
+    {id:'p943',section:'1000W 이상 ATX 미들형 기본파워',model:'[FSP] HYDRO PTM X PRO 1000W PLATINUM 화이트 ATX 3.0',price:271000},
+    {id:'p944',section:'1000W 이상 ATX 미들형 기본파워',model:'[슈퍼플라워] SF-1000F14XP LEADEX VII PRO PLATINUM 화이트 ATX3.1',price:278500},
+    {id:'p945',section:'1000W 이상 ATX 미들형 기본파워',model:'[시소닉] NEW FOCUS V4 GX-1000 GOLD 풀모듈러 ATX3.1 화이트',price:285000},
+    {id:'p946',section:'1000W 이상 ATX 미들형 기본파워',model:'[리안리] EDGE 1000 80PLUS 플래티넘 화이트',price:311200},
+    {id:'p947',section:'1000W 이상 ATX 미들형 기본파워',model:'[Antec] SIGNATURE 1000W TITANIUM',price:455000},
+    {id:'p948',section:'1000W 이상 ATX 미들형 기본파워',model:'[ASUS] ROG THOR 1000P2',price:528000},
+    {id:'p949',section:'1200W 이상 ATX 미들형 기본파워',model:'[쿨러마스터] MWE GOLD 1250-V2 ATX3.0 FULL MODULAR',price:157400},
+    {id:'p950',section:'1200W 이상 ATX 미들형 기본파워',model:'[Segotep] GM1250W 80PLUS골드 풀모듈러 ATX3.1 블랙',price:159000},
+    {id:'p951',section:'1200W 이상 ATX 미들형 기본파워',model:'[ABKO] 앱코 코어맥스 CM-1200G ETA골드 ATX3.1',price:169200},
+    {id:'p952',section:'1200W 이상 ATX 미들형 기본파워',model:'[Segotep] GM1250W 80PLUS골드 풀모듈러 ATX3.1 화이트',price:174000},
+    {id:'p953',section:'1200W 이상 ATX 미들형 기본파워',model:'[잘만] TeraMax II VIEW 1200W 80PLUS골드 풀모듈러 ATX3.1 블랙',price:197200},
+    {id:'p954',section:'1200W 이상 ATX 미들형 기본파워',model:'[Antec] GSK 1200W 80PLUS골드 풀모듈러 ATX3.1',price:199000},
+    {id:'p955',section:'1200W 이상 ATX 미들형 기본파워',model:'[darkFlash] UPMOST 1250W 80PLUS GOLD FULL MODULAR ATX3.0 (PCIE5) 화이트',price:210400},
+    {id:'p956',section:'1200W 이상 ATX 미들형 기본파워',model:'[MSI] MAG A1250GL 80PLUS골드 풀모듈러 ATX3.1',price:230800},
+    {id:'p957',section:'1200W 이상 ATX 미들형 기본파워',model:'[쿨러마스터] GX III GOLD 1250 풀모듈러 ATX3.0',price:263500},
+    {id:'p958',section:'1200W 이상 ATX 미들형 기본파워',model:'[리안리] EDGE GOLD 1200 화이트',price:271100},
+    {id:'p959',section:'1200W 이상 ATX 미들형 기본파워',model:'[슈퍼플라워] SF-1300F14XG LEADEX VII GOLD ATX 3.1',price:271300},
+    {id:'p960',section:'1200W 이상 ATX 미들형 기본파워',model:'[리안리] SX1200 80PLUS플래티넘 화이트',price:291300},
+    {id:'p961',section:'1200W 이상 ATX 미들형 기본파워',model:'[리안리] SX1200 80PLUS플래티넘 블랙',price:291300},
+    {id:'p962',section:'1200W 이상 ATX 미들형 기본파워',model:'[슈퍼플라워] SF-1200F14XP LEADEX VII PRO PLATINUM 블랙 ATX 3.1 (PCIE5)',price:302700},
+    {id:'p963',section:'1200W 이상 ATX 미들형 기본파워',model:'[Antec] HCG PRO 1200W 80PLUS플래티넘 풀모듈러 ATX3.1',price:339000},
+    {id:'p964',section:'1200W 이상 ATX 미들형 기본파워',model:'[ASUS] ROG STRIX 1200W Platinum',price:366300},
+    {id:'p965',section:'1200W 이상 ATX 미들형 기본파워',model:'[리안리] EDGE 1300 80PLUS 플래티넘 블랙',price:370600},
+    {id:'p966',section:'1200W 이상 ATX 미들형 기본파워',model:'[MSI] MEG Ai1300P 80PLUS플래티넘 풀모듈러 ATX3.1',price:371800},
+    {id:'p967',section:'1200W 이상 ATX 미들형 기본파워',model:'[마이크로닉스] Classic II 1300W 80PLUS플래티넘 ATX3.1',price:373500},
+    {id:'p968',section:'1200W 이상 ATX 미들형 기본파워',model:'[CORSAIR] RM1200x SHIFT 80PLUS Gold ATX 3.0',price:376400},
+    {id:'p969',section:'1200W 이상 ATX 미들형 기본파워',model:'[리안리] EDGE 1300 80PLUS 플래티넘 화이트',price:380900},
+    {id:'p970',section:'1200W 이상 ATX 미들형 기본파워',model:'[마이크로닉스] WIZMAX G-1650W 80PLUS골드 ATX3.1',price:499000},
+    {id:'p971',section:'1200W 이상 ATX 미들형 기본파워',model:'[CORSAIR] HX1500i 80PLUS플래티넘 ATX3.1',price:528800},
+    {id:'p972',section:'1200W 이상 ATX 미들형 기본파워',model:'[ASRock] TAICHI TC-1650T 80PLUS티타늄 풀모듈러 ATX3.1',price:659000},
+    {id:'p973',section:'1200W 이상 ATX 미들형 기본파워',model:'[MSI] MEG Ai1600T 80PLUS티타늄 풀모듈러 ATX 3.1',price:679000},
+    {id:'p974',section:'1200W 이상 ATX 미들형 기본파워',model:'[be quiet] DARK POWER PRO 13 1600W 80PLUS티타늄',price:825700},
+    {id:'p975',section:'1200W 이상 ATX 미들형 기본파워',model:'[시소닉] PRIME TITANIUM TX-1600 풀모듈러 ATX3.1',price:975400},
+    {id:'p976',section:'2000W 이상 ATX 미들형 기본파워',model:'[슈퍼플라워] SF-2000F14HP LEADEX PLATINUM',price:711200},
+    {id:'p977',section:'2000W 이상 ATX 미들형 기본파워',model:'[쿨러마스터] X Mighty Platinum 2000W',price:722400},
+    {id:'p978',section:'2000W 이상 ATX 미들형 기본파워',model:'[마이크로닉스] WIZMAX P-2500W 80PLUS플래티넘 ATX 3.1',price:799000},
+    {id:'p979',section:'2000W 이상 ATX 미들형 기본파워',model:'[슈퍼플라워] SF-2800F14HP LEADEX TITANIUM ATX3.1',price:1003300},
+    {id:'p980',section:'2000W 이상 ATX 미들형 기본파워',model:'[PNC PARTNER] EVEREST AP3000 Ai 80PLUS플래티넘',price:1374000},
+    {id:'p981',section:'M-ATX(SFX) 미니파워',model:'[이도디스플레이] ICE-MAN M450W V2.2 KC (정격 200W)',price:27500},
+    {id:'p982',section:'M-ATX(SFX) 미니파워',model:'[AONE] TFX-500P KC (DAVEN N1 MESH 케이스 전용)',price:28500},
+    {id:'p983',section:'M-ATX(SFX) 미니파워',model:'[AONE] STORM SFX 300LF',price:33600},
+    {id:'p984',section:'M-ATX(SFX) 미니파워',model:'[마이크로닉스] MTFX400STE08S (DAVEN N1 MESH 케이스 전용)',price:50000},
+    {id:'p985',section:'M-ATX(SFX) 미니파워',model:'[마이크로닉스] Compact SFX 400W 80PLUS브론즈',price:85200},
+    {id:'p986',section:'M-ATX(SFX) 미니파워',model:'[마이크로닉스] Compact SFX 450W 80PLUS브론즈',price:98000},
+  ]},
+  CASE:{label:'케이스',color:'#475569',bg:'#f1f5f9',items:[
+    {id:'p987',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[앱코] NCORE 언더바',price:24500},
+    {id:'p988',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[3RSYS] R150 (블랙)',price:32000},
+    {id:'p989',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[DAVEN] 아쿠아 마린보이 (블랙)',price:34800},
+    {id:'p990',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[3RSYS] R150 (화이트)',price:35400},
+    {id:'p991',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[DAVEN] D4 MESH 강화유리 (블랙)',price:36000},
+    {id:'p992',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[마이크로닉스] 오피스',price:36600},
+    {id:'p993',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[싸이번] SD600 도미닉 RGB (블랙)',price:37500},
+    {id:'p994',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[DAVEN] 아쿠아 마린보이 (화이트)',price:37800},
+    {id:'p995',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[앱코] G15 세이퍼 아크릴 (블랙)',price:39400},
+    {id:'p996',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[MSI] MAG 포지 120A 에어플로우',price:39900},
+    {id:'p997',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[DAVEN] SIX FLOW (화이트)',price:41500},
+    {id:'p998',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[DAVEN] D6 MESH 강화유리 (블랙)',price:41900},
+    {id:'p999',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[darkFlash] DS500 RGB (블랙)',price:42000},
+    {id:'p1000',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[DAVEN] AQUA 다이버 (블랙)',price:42000},
+    {id:'p1001',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[darkFlash] DS500 RGB (화이트)',price:43000},
+    {id:'p1002',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[잘만] N30 백사십 (화이트)',price:49200},
+    {id:'p1003',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[DAVEN] AQUA 다이버 (화이트)',price:49500},
+    {id:'p1004',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[몬스타] 가츠 X50A BTF (화이트)',price:50600},
+    {id:'p1005',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[앱코] U30 마린 (화이트)',price:52200},
+    {id:'p1006',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[몬스타] 가츠 X520A (화이트)',price:52500},
+    {id:'p1007',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[DAVEN] D7 Mesh 세븐팬 (블랙)',price:52500},
+    {id:'p1008',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[마이크로닉스] WIZMAX CHILL 세븐팬',price:52600},
+    {id:'p1009',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[앱코] U30P 마린+ 디스플레이 (블랙)',price:53000},
+    {id:'p1010',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[darkFlash] DRX70 MESH RGB 강화유리 (화이트)',price:53500},
+    {id:'p1011',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[MSI] PRO P050R ARGB (블랙)',price:57400},
+    {id:'p1012',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[MSI] MAG 포지 320R 에어플로우 (블랙)',price:58300},
+    {id:'p1013',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[앱코] U30P 마린+ 디스플레이 (화이트)',price:58500},
+    {id:'p1014',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[MSI] PRO P050R ARGB (화이트)',price:59400},
+    {id:'p1015',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[darkFlash] DS900 ARGB 강화유리 (블랙)',price:59800},
+    {id:'p1016',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[darkFlash] DPF70 ARGB (블랙)',price:59800},
+    {id:'p1017',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[DAVEN] AQUARIUM (블랙) 아쿠아리움 BTF',price:59900},
+    {id:'p1018',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[DAVEN] D7 Mesh 세븐팬 (화이트)',price:60000},
+    {id:'p1019',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[앱코] UH40 킬러웨일 ARGB (블랙)',price:63500},
+    {id:'p1020',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[darkFlash] DS900 ARGB 강화유리 (블랙 우드)',price:64500},
+    {id:'p1021',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[몬스타] 가츠 X620A 리버스 (블랙)',price:64900},
+    {id:'p1022',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[darkFlash] DS900 ARGB 강화유리 (화이트)',price:65000},
+    {id:'p1023',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[darkFlash] DPF70 ARGB (화이트)',price:65000},
+    {id:'p1024',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[DAVEN] AQUARIUM (화이트) 아쿠아리움 BTF',price:66800},
+    {id:'p1025',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[앱코] UH40 킬러웨일 ARGB (화이트)',price:67500},
+    {id:'p1026',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[몬스타] 가츠 X620A 리버스 (화이트)',price:68400},
+    {id:'p1027',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[darkFlash] DS900 ARGB 강화유리 (화이트 우드)',price:68900},
+    {id:'p1028',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[PCCOOLER] CPS C3 T700 ARGB (화이트)',price:69000},
+    {id:'p1029',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[MSI] MAG 포지 320R 에어플로우 (화이트)',price:69500},
+    {id:'p1030',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[darkFlash] DS900 PRO ARGB (블랙)',price:69500},
+    {id:'p1031',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[darkFlash] DK1000 MESH 강화유리 (블랙)',price:72600},
+    {id:'p1032',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[darkFlash] DS900 PRO ARGB (화이트)',price:73500},
+    {id:'p1033',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[앱코] UD50 블루웨일 ARGB BTF (블랙)',price:75200},
+    {id:'p1034',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[앱코] UD50 블루웨일 ARGB BTF (화이트)',price:81900},
+    {id:'p1035',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[darkFlash] DQX80 ARGB BTF (블랙)',price:84500},
+    {id:'p1036',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[아이구주] VENTI T7000 BTF STEALTH',price:89000},
+    {id:'p1037',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[darkFlash] DQX80 ARGB BTF (화이트)',price:89500},
+    {id:'p1038',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[BRAVOTEC] 트레저 X9 920T 타이탄 글래스 (화이트)',price:92000},
+    {id:'p1039',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[3RSYS] L904 Quiet (블랙)',price:94700},
+    {id:'p1040',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[darkFlash] DS950V ARGB 디스플레이 (블랙)',price:95200},
+    {id:'p1041',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[마이크로닉스] WIZMAX 슬로프 (블랙)',price:98900},
+    {id:'p1042',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[darkFlash] DS950V ARGB 디스플레이 (화이트)',price:99200},
+    {id:'p1043',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[마이크로닉스] WIZMAX 스텔라',price:99200},
+    {id:'p1044',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[3RSYS] L904 Quiet (화이트)',price:99700},
+    {id:'p1045',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[앱코] UD51 엑시드 ARGB BTF (블랙)',price:99800},
+    {id:'p1046',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[darkFlash] DLX21 RGB MESH 강화유리 (블랙)',price:101200},
+    {id:'p1047',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[darkFlash] DLX21 RGB MESH 강화유리 (화이트)',price:107000},
+    {id:'p1048',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[앱코] G50 빅폴로우 MESH ARGB BTF (화이트)',price:108800},
+    {id:'p1049',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[마이크로닉스] WIZMAX 슬로프 (화이트)',price:109300},
+    {id:'p1050',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[리안리] Vector V100 ARGB (블랙)',price:109900},
+    {id:'p1051',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[리안리] Vector V100 ARGB (화이트)',price:109900},
+    {id:'p1052',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[MSI] MAG PANO 100L 프로젝트 제로 (블랙) BTF 지원',price:120900},
+    {id:'p1053',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[MSI] MAG PANO 100L 프로젝트 제로 (화이트) BTF 지원',price:122000},
+    {id:'p1054',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[darkFlash] DY470 ARGB 강화유리 (블랙) [BTF지원]',price:126600},
+    {id:'p1055',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[darkFlash] DY470 ARGB 강화유리 (화이트) [BTF지원]',price:130500},
+    {id:'p1056',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[NZXT] H6 Flow (화이트)',price:131100},
+    {id:'p1057',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[NZXT] H6 Flow (블랙)',price:131100},
+    {id:'p1058',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[Antec] C8 MESH (화이트)',price:139000},
+    {id:'p1059',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[Antec] C8 MESH (블랙)',price:139000},
+    {id:'p1060',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[잘만] P50 DS (블랙)',price:139000},
+    {id:'p1061',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[NZXT] H5 Flow RGB V2 (블랙)',price:139000},
+    {id:'p1062',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[NZXT] H5 Flow RGB V2 (화이트)',price:139000},
+    {id:'p1063',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[앱코] UD50C 루시드 앰비언트 풀커브드 ARGB BTF (블랙)',price:140000},
+    {id:'p1064',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[앱코] UD50C 루시드 앰비언트 풀커브드 ARGB BTF (화이트)',price:140000},
+    {id:'p1065',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[Antec] C8 MESH (블랙 우드)',price:141000},
+    {id:'p1066',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[ASUS] ProArt PA401 우드 에디션 메탈 (블랙)',price:142200},
+    {id:'p1067',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[잘만] P50 DS (화이트)',price:145000},
+    {id:'p1068',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[Antec] C5 MESH ARGB BTF (블랙)',price:149000},
+    {id:'p1069',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[Antec] C5 MESH ARGB BTF (화이트)',price:149000},
+    {id:'p1070',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[마이크로닉스] WIZMAX 루프탑',price:149000},
+    {id:'p1071',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[be quiet] PURE BASE 501 Airflow Window (블랙)',price:149000},
+    {id:'p1072',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[마이크로닉스] WIZMAX 루프탑 (화이트)',price:149000},
+    {id:'p1073',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[쿨러마스터] ELITE 600 SEVEN ARGB (블랙)',price:153500},
+    {id:'p1074',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[SilverStone] SST-FLP01W 레트로',price:155600},
+    {id:'p1075',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[Antec] C7 MESH ARGB BTF (블랙) BTF',price:159000},
+    {id:'p1076',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[Antec] C8 MESH QUAD ARGB (화이트)',price:159000},
+    {id:'p1077',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[NZXT] H6 Flow RGB (블랙)',price:161200},
+    {id:'p1078',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[쿨러마스터] ELITE 600 SEVEN ARGB (화이트)',price:161300},
+    {id:'p1079',section:'미들타워 [일반형, ATX·M-ATX 보드사용, 500mm 미만]',model:'[be quiet] PURE BASE 501 Airflow Window (화이트)',price:163000},
   ]},
 };
 
@@ -1153,6 +2436,11 @@ const state = {};      // 선택된 부품 { itemId: {item, cat, qty, customPric
 let customs = [];      // 수기 항목
 let customSeq = 0;
 let currentCopyTab = 'excel';
+
+// 검색어 (카테고리별)
+const searchQ = {};
+// 섹션 열림 상태 (catKey::section)
+const openSecs = {};
 
 /* ════════════════════════════════════════════════════════
    커스텀 캘린더
@@ -1395,37 +2683,145 @@ function renderParts(){
     const selected = Object.values(state).find(s=>s.cat===catKey);
     const selPrice = selected ? (selected.customPrice!==undefined ? selected.customPrice : selected.item.price) * selected.qty : 0;
 
+    // 검색어 (카테고리별 별도 관리)
+    const q = (searchQ[catKey] || '').trim().toLowerCase();
+
+    // 아이템 필터링 + 섹션별 그룹핑
+    const filteredItems = q
+      ? cat.items.filter(it => it.model.toLowerCase().includes(q) || (it.section||'').toLowerCase().includes(q))
+      : cat.items;
+
+    // 섹션별 그룹핑 (순서 유지)
+    const sectionGroups = [];
+    const sectionMap = {};
+    filteredItems.forEach(it=>{
+      const sec = it.section || '기타';
+      if(!sectionMap[sec]){
+        sectionMap[sec] = [];
+        sectionGroups.push(sec);
+      }
+      sectionMap[sec].push(it);
+    });
+
     html += `<div class="cat-card${isOpen?' open':''}${selected?' has-selection':''}">
       <div class="cat-hd" onclick="togCat('${catKey}')">
-        <span class="cat-pill">${cat.label}</span>
-        <span class="cat-preview${selected?' selected':''}">${selected ? escapeHtml(selected.customName || selected.item.model) : '선택 안 됨'}</span>
+        <span class="cat-pill">${escapeHtml(cat.label)}</span>
+        <span class="cat-preview${selected?' selected':''}" title="${selected ? escapeHtml(selected.customName || selected.item.model) : ''}">${selected ? escapeHtml(selected.customName || selected.item.model) : '선택 안 됨'}</span>
         ${selected ? `<span class="cat-price">${fmt(selPrice)}</span>` : ''}
         <span class="cat-chev">▼</span>
       </div>
       <div class="cat-body">`;
 
-    cat.items.forEach(item=>{
-      const on = !!state[item.id];
-      const s = state[item.id];
-      html += `<div class="part${on?' on':''}" onclick="pick('${catKey}','${item.id}')">
-        <div class="radio"></div>
-        <div class="part-info">
-          <div class="part-model">${escapeHtml(item.model)}</div>
+    // 검색창 (카테고리 내)
+    html += `<div class="cat-search" onclick="event.stopPropagation()">
+      <input type="text"
+        class="cat-search-input"
+        data-cat="${catKey}"
+        placeholder="이 카테고리 안에서 검색 (${cat.items.length}개)"
+        value="${escapeHtml(searchQ[catKey] || '')}"
+        oninput="onSearchInput('${catKey}', this.value, this)"
+        oncompositionstart="onCompStart(this)"
+        oncompositionend="onCompEnd('${catKey}', this)"
+        onkeydown="event.stopPropagation()">
+      ${q ? `<button class="cat-search-clear" onclick="clearSearch('${catKey}',event)" title="검색 지우기">✕</button>` : ''}
+    </div>`;
+
+    if(sectionGroups.length === 0){
+      html += `<div class="cat-empty">검색 결과가 없습니다</div>`;
+    }
+
+    sectionGroups.forEach(sec=>{
+      const items = sectionMap[sec];
+      const secKey = catKey + '::' + sec;
+      // 검색 중에는 모든 섹션 자동 열림, 아니면 openSecs 상태 사용
+      const secOpen = q ? true : !!openSecs[secKey];
+
+      html += `<div class="sec-block${secOpen?' open':''}">
+        <div class="sec-hd" onclick="togSec('${catKey}','${jsEsc(sec)}',event)">
+          <span class="sec-chev">▸</span>
+          <span class="sec-name">${escapeHtml(sec)}</span>
+          <span class="sec-count">${items.length}</span>
         </div>
-        <div class="part-r">
-          <span class="part-price">${fmt(item.price)}</span>
-          ${on ? `<div class="qty-ctrl" onclick="event.stopPropagation()">
-            <button class="qbtn" onclick="adjQty('${item.id}',-1,event)">−</button>
-            <span class="qval">${s.qty}</span>
-            <button class="qbtn" onclick="adjQty('${item.id}',1,event)">+</button>
-          </div>` : ''}
-        </div>
-      </div>`;
+        <div class="sec-body">`;
+
+      items.forEach(item=>{
+        const on = !!state[item.id];
+        const s = state[item.id];
+        html += `<div class="part${on?' on':''}" onclick="pick('${catKey}','${item.id}')">
+          <div class="radio"></div>
+          <div class="part-info">
+            <div class="part-model" title="${escapeHtml(item.model)}">${escapeHtml(item.model)}</div>
+          </div>
+          <div class="part-r">
+            <span class="part-price">${fmt(item.price)}</span>
+            ${on ? `<div class="qty-ctrl" onclick="event.stopPropagation()">
+              <button class="qbtn" onclick="adjQty('${item.id}',-1,event)">−</button>
+              <span class="qval">${s.qty}</span>
+              <button class="qbtn" onclick="adjQty('${item.id}',1,event)">+</button>
+            </div>` : ''}
+          </div>
+        </div>`;
+      });
+
+      html += `</div></div>`;
     });
 
     html += `</div></div>`;
   }
   document.getElementById('partsWrap').innerHTML = html;
+}
+
+// 섹션 토글
+function togSec(catKey, sec, ev){
+  if(ev) ev.stopPropagation();
+  const k = catKey + '::' + sec;
+  openSecs[k] = !openSecs[k];
+  renderParts();
+}
+
+// 한글 IME 조합 중 플래그 (조합 중에는 리렌더링 안 함 — 안 그러면 자모가 분리됨)
+let isComposing = false;
+
+function onCompStart(inp){
+  isComposing = true;
+}
+
+function onCompEnd(catKey, inp){
+  isComposing = false;
+  // 조합 완료된 최종 문자열로 검색 실행
+  onSearchInput(catKey, inp.value, inp);
+}
+
+// 검색 입력 (debounce 없이 즉시 — 단, 한글 IME 조합 중에는 리렌더링 건너뜀)
+function onSearchInput(catKey, val, inp){
+  searchQ[catKey] = val;
+  // 검색 입력 시 카테고리는 자동 열림 유지
+  openCats[catKey] = true;
+
+  // 한글 조합 중에는 DOM을 다시 그리지 않음 (IME 조합 깨짐 방지)
+  if(isComposing) return;
+
+  renderParts();
+  // 입력 후 포커스 복원
+  requestAnimationFrame(()=>{
+    const target = document.querySelector(`.cat-search-input[data-cat="${catKey}"]`);
+    if(target){
+      target.focus();
+      const len = target.value.length;
+      try { target.setSelectionRange(len, len); } catch(e){}
+    }
+  });
+}
+
+function clearSearch(catKey, ev){
+  if(ev) ev.stopPropagation();
+  searchQ[catKey] = '';
+  renderParts();
+}
+
+// 섹션 이름에 작은따옴표가 들어가 있을 경우 안전하게 이스케이프
+function jsEsc(s){
+  return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
 }
 
 function renderPreview(){
@@ -1502,7 +2898,7 @@ function renderPreview(){
         const displayName = r.customName || r.item.model;
         html += `<tr class="q-row">
           <td>
-            <div class="q-item-name">${escapeHtml(displayName)}</div>
+            <div class="q-item-name" title="${escapeHtml(displayName)}">${escapeHtml(displayName)}</div>
             <div class="q-item-detail">분류: <strong>${DB[r.cat].label}</strong></div>
           </td>
           <td>
@@ -1527,7 +2923,7 @@ function renderPreview(){
       customSubtotal += sub;
       html += `<tr class="q-row">
         <td>
-          <div class="q-item-name">${escapeHtml(c.name || '(미입력 수기 항목)')}</div>
+          <div class="q-item-name" title="${escapeHtml(c.name || '(미입력 수기 항목)')}">${escapeHtml(c.name || '(미입력 수기 항목)')}</div>
           <div class="q-item-detail">수기 입력 항목</div>
         </td>
         <td>
@@ -1554,26 +2950,35 @@ function renderPreview(){
     <div class="total-vat">VAT 포함 시 ${fmt(grand)}</div>
   </div>`;
 
-  // 수기 항목 편집 영역 (인쇄 시 숨김)
+  // 수기 항목 편집 영역 (별도 패널 / 인쇄 시 숨김)
+  const editPanel = document.getElementById('manualEditPanel');
   if(customs.length > 0){
-    html += `<div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border);" class="no-print">
-      <div style="font-size:12px;font-weight:700;color:var(--text-2);margin-bottom:10px;">수기 항목 편집</div>`;
+    let editHtml = `<div class="manual-edit-hd">
+        <span class="manual-edit-title">수기 항목 편집</span>
+        <span class="manual-edit-sub">화면에서만 보이며 인쇄/PDF에는 나오지 않습니다</span>
+      </div>
+      <div class="manual-edit-list">`;
     customs.forEach(c=>{
-      html += `<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;padding:8px;background:var(--panel-2);border-radius:8px;border:1px solid var(--border);">
-        <input type="text" value="${escapeHtml(c.name||'')}" placeholder="항목명 (예: 설치비, 운영장비)"
-          onchange="setCustomName(${c.id}, this.value)"
-          style="flex:1;padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;font-family:inherit;outline:none;"/>
-        <button class="qbtn" onclick="adjCustomQty(${c.id},-1)">−</button>
-        <span style="font-size:12px;font-weight:700;min-width:18px;text-align:center;">${c.qty||1}</span>
-        <button class="qbtn" onclick="adjCustomQty(${c.id},1)">+</button>
-        <input type="number" value="${c.price||0}" placeholder="단가"
-          onchange="setCustomPrice(${c.id}, this.value)"
-          style="width:110px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;text-align:right;font-family:inherit;outline:none;"/>
-        <span style="font-size:11px;color:var(--text-3);">원</span>
-        <button onclick="delCustom(${c.id})" style="background:none;border:none;cursor:pointer;font-size:18px;color:var(--text-3);width:24px;height:24px;">×</button>
+      editHtml += `<div class="manual-edit-row">
+        <input type="text" class="me-name" value="${escapeHtml(c.name||'')}" placeholder="항목명 (예: 설치비, 운영장비)"
+          onchange="setCustomName(${c.id}, this.value)"/>
+        <div class="me-qty">
+          <button class="qbtn" onclick="adjCustomQty(${c.id},-1)">−</button>
+          <span class="me-qval">${c.qty||1}</span>
+          <button class="qbtn" onclick="adjCustomQty(${c.id},1)">+</button>
+        </div>
+        <input type="number" class="me-price" value="${c.price||0}" placeholder="단가"
+          onchange="setCustomPrice(${c.id}, this.value)"/>
+        <span class="me-unit">원</span>
+        <button class="me-del" onclick="delCustom(${c.id})" aria-label="삭제">×</button>
       </div>`;
     });
-    html += `</div>`;
+    editHtml += `</div>`;
+    editPanel.innerHTML = editHtml;
+    editPanel.style.display = '';
+  } else {
+    editPanel.innerHTML = '';
+    editPanel.style.display = 'none';
   }
 
   document.getElementById('quoteCard').innerHTML = html;
